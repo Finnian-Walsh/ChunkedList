@@ -2,6 +2,7 @@
 
 #include <ostream>
 #include <initializer_list>
+#include <cstring>
 
 template<typename T, size_t ChunkSize = 32, bool ShouldCopy = true>
 class ChunkedList {
@@ -46,13 +47,11 @@ class ChunkedList {
         Iterator operator--(int);
         
         T &operator*();
-        
-        template<typename, size_t, bool>
-        friend bool operator==(const Iterator &x, const Iterator &y);
-        
-        template<typename, size_t, bool>
-        friend bool operator!=(const Iterator &x, const Iterator &y);
       
+        inline bool operator==(Iterator other);
+        
+        inline bool operator!=(Iterator other);
+        
       private:
         Chunk *chunk{nullptr};
         int index{0};

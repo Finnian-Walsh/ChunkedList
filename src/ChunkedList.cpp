@@ -122,15 +122,13 @@ T &ChunkedList<T, ChunkSize, ShouldCopy>::Iterator::operator*() {
 }
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
-bool operator==(const typename ChunkedList<T, ChunkSize, ShouldCopy>::Iterator &x,
-                const typename ChunkedList<T, ChunkSize, ShouldCopy>::Iterator &y) {
-  return x.chunk == y.chunk && x.index == y.index;
+inline bool ChunkedList<T, ChunkSize, ShouldCopy>::Iterator::operator==(Iterator other) {
+  return std::memcmp(this, &other, sizeof(Iterator));
 }
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
-bool operator!=(const typename ChunkedList<T, ChunkSize, ShouldCopy>::Iterator &x,
-                const typename ChunkedList<T, ChunkSize, ShouldCopy>::Iterator &y) {
-  return x.index == y.index || x.chunk != y.chunk;
+inline bool ChunkedList<T, ChunkSize, ShouldCopy>::Iterator::operator!=(Iterator other) {
+  return std::memcmp(this, &other, sizeof(Iterator)) == 0;
 }
 
 // ChunkedList
