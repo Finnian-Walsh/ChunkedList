@@ -3,5 +3,6 @@ project(ChunkedList)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_library(ChunkedList STATIC src/ChunkedList.hpp
-        src/ChunkedList.cpp)
+set(SRC src/ChunkedList.hpp src/ChunkedList.hpp)
+
+add_library(ChunkedList STATIC ${SRC})
