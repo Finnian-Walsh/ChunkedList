@@ -10,7 +10,7 @@ class ChunkedList
 Each **Chunk** contains a fixed array, of size ChunkSize, and the **Chunk** class has 3 constructors. However,
 **Chunks** are abstracted away and hidden from the user's view.
 
-Each **Chunk** keep track of its next index, incrementing and decrementing it by 1 each push and pop respectively.
+Furthermore, each **Chunk** keep track of its next index, incrementing and decrementing it by 1 each push and pop respectively.
 Therefore, calling the pop method on a **ChunkedList** doesn't deallocate anything unless the next index of the front **Chunk** is equal to 0, causing the entire Chunk and its contents to be deallocated.
 
 # How to use:
