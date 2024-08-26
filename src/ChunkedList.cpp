@@ -318,7 +318,7 @@ std::ostream &operator<<(std::ostream &os, ChunkedList<T, ChunkSize, ShouldCopy>
   DEBUG_EXECUTE({ os << '\n'; })
   auto *chunk = chunkedList.front;
   
-  while (chunk != nullptr) {
+  while (chunk) {
     DEBUG_LOG("Next index: " << chunk->nextIndex << '\n')
     
     for (int i = 0; i < chunk->nextIndex; ++i)
