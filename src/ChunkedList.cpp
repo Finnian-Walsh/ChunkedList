@@ -233,7 +233,7 @@ typename ChunkedList<T, ChunkSize, ShouldCopy>::ChunkIterator ChunkedList<T, Chu
 }
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
-void ChunkedList<T, ChunkSize, ShouldCopy>::push(typename std::conditional<ShouldCopy, T, const T&> value) {
+void ChunkedList<T, ChunkSize, ShouldCopy>::push(typename std::conditional<ShouldCopy, T, const T &> value) {
   if constexpr (ShouldCopy)
     if (back->nextIndex == ChunkSize) {
       auto *nextChunk = new Chunk{value};
@@ -281,29 +281,31 @@ size_t ChunkedList<T, ChunkSize, ShouldCopy>::size() const { RET_SIZE }
 #undef RET_SIZE
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
-bool operator==(const ChunkedList<T, ChunkSize, ShouldCopy>& x, const ChunkedList<T, ChunkSize, ShouldCopy>& y) {
+bool operator==(const ChunkedList<T, ChunkSize, ShouldCopy> &x, const ChunkedList<T, ChunkSize, ShouldCopy> &y) {
   if (&x == &y)
     return true;
   if (x.length() != y.length())
     return false;
   
-  for (typename ChunkedList<T, ChunkSize, ShouldCopy>::Iterator xIterator = x.begin(), yIterator = y.begin(); xIterator != x.endChunk(); ++xIterator, ++yIterator) {
-     if (xIterator != yIterator)
-       return false;
+  for (typename ChunkedList<T, ChunkSize, ShouldCopy>::Iterator xIterator = x.begin(), yIterator = y.begin();
+       xIterator != x.endChunk(); ++xIterator, ++yIterator) {
+    if (xIterator != yIterator)
+      return false;
   }
   
   return true;
 }
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
-bool operator!=(const ChunkedList<T, ChunkSize, ShouldCopy>& x, const ChunkedList<T, ChunkSize, ShouldCopy>& y) {
+bool operator!=(const ChunkedList<T, ChunkSize, ShouldCopy> &x, const ChunkedList<T, ChunkSize, ShouldCopy> &y) {
   if (&x == &y)
     return false;
   if (x.length() != y.length())
     return true;
   
   
-  for (typename ChunkedList<T, ChunkSize, ShouldCopy>::Iterator xIterator = x.begin(), yIterator = y.begin(); xIterator != x.endChunk(); ++xIterator, ++yIterator) {
+  for (typename ChunkedList<T, ChunkSize, ShouldCopy>::Iterator xIterator = x.begin(), yIterator = y.begin();
+       xIterator != x.endChunk(); ++xIterator, ++yIterator) {
     if (xIterator != yIterator)
       return true;
   }
@@ -331,4 +333,15 @@ std::ostream &operator<<(std::ostream &os, ChunkedList<T, ChunkSize, ShouldCopy>
   os << " ]";
   
   return os;
+}
+
+template<typename T, size_t ChunkSize, bool ShouldCopy>
+ChunkedList<T, ChunkSize, ShouldCopy>::iterator begin(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList) {
+  return chunkedList.begin();
+}
+
+
+template<typename T, size_t ChunkSize, bool ShouldCopy>
+ChunkedList<T, ChunkSize, ShouldCopy>::iterator end(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList) {
+  return chunkedList.end();
 }
