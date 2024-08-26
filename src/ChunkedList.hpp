@@ -47,11 +47,11 @@ class ChunkedList {
         Iterator operator--(int);
         
         T &operator*();
-      
+        
         inline bool operator==(Iterator other);
         
         inline bool operator!=(Iterator other);
-        
+      
       private:
         Chunk *chunk{nullptr};
         int index{0};
@@ -93,11 +93,9 @@ class ChunkedList {
     
     [[nodiscard]] size_t size() const;
     
-    template<typename, size_t, bool>
-    friend bool operator==(const ChunkedList &x, const ChunkedList &y);
+    bool operator==(const ChunkedList &other);
     
-    template<typename, size_t, bool>
-    friend bool operator!=(const ChunkedList &x, const ChunkedList &y);
+    bool operator!=(const ChunkedList &other);
     
     template<typename, size_t, bool>
     friend std::ostream &operator<<(std::ostream &os, ChunkedList &chunkedList);
