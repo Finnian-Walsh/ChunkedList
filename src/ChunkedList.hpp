@@ -84,7 +84,7 @@ class ChunkedList {
     
     ChunkIterator endChunk();
     
-    void push(typename std::conditional<ShouldCopy, T, const T&>);
+    void push(typename std::conditional<ShouldCopy, T, const T &>);
     
     void pop();
     
