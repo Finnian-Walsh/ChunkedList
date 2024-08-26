@@ -1,5 +1,7 @@
 # Chunked List
-A basic C++ list data structure, which uses **chunks** to store data.
+
+A basic C++ list data structure, which uses **Chunks** to store data.
+
 ```cpp
 template<typename T, size_t ChunkSize = 32, bool ShouldCopy = false>
 class ChunkedList
@@ -7,6 +9,7 @@ class ChunkedList
 
 
 # How to use:
+
 - Download the libChunkedList.a file
 - Create a new directory in your project, where you store your libraries, named ChunkedList
 - Add another directory inside the ChunkedList directory named include, as well as lib
