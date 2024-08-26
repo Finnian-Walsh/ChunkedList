@@ -7,6 +7,8 @@ template<typename T, size_t ChunkSize = 32, bool ShouldCopy = false>
 class ChunkedList
 ```
 
+Each **Chunk** contains a fixed array, of size ChunkSize, and the **Chunk** class has 3 constructors. However,
+**Chunks** are abstracted away and hidden from the user's view.
 
 # How to use:
 
