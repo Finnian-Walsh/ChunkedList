@@ -1,4 +1,4 @@
-#include "ChunkedList.hpp"
+#include "../include/ChunkedList.hpp"
 
 #include <sstream>
 
@@ -344,12 +344,12 @@ const char* ChunkedList<T, ChunkSize, ShouldCopy>::concat(const char* delimiter)
 }
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
-ChunkedList<T, ChunkSize, ShouldCopy>::Iterator begin(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList) {
+typename ChunkedList<T, ChunkSize, ShouldCopy>::Iterator begin(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList) {
   return chunkedList.begin();
 }
 
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
-ChunkedList<T, ChunkSize, ShouldCopy>::Iterator end(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList) {
+typename ChunkedList<T, ChunkSize, ShouldCopy>::Iterator end(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList) {
   return chunkedList.end();
 }
