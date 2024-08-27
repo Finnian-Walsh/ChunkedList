@@ -1,5 +1,7 @@
 #include "ChunkedList.hpp"
 
+#include <sstream>
+
 #ifdef CHUNKED_LIST_DEBUGGING
 #include <iostream>
 #define DEBUG_LINE std::cout << std::endl;
@@ -328,6 +330,17 @@ std::ostream &operator<<(std::ostream &os, ChunkedList<T, ChunkSize, ShouldCopy>
   os << " ]";
   
   return os;
+}
+
+template<typename T, size_t ChunkSize, bool ShouldCopy>
+const char* ChunkedList<T, ChunkSize, ShouldCopy>::concat(const char* delimiter) {
+  std::ostringstream concatenation;
+  
+  for (typename std::conditional<ShouldCopy, T, const T &> v : *this) {
+    concatenation << v << delimiter;
+  }
+  
+  return concatenation.view().cbegin();
 }
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>

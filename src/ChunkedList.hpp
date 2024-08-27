@@ -99,6 +99,8 @@ class ChunkedList {
     
     template<typename, size_t, bool>
     friend std::ostream &operator<<(std::ostream &os, ChunkedList &chunkedList);
+    
+    const char* concat(const char* delimiter);
 };
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
