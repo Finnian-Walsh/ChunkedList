@@ -1,6 +1,6 @@
 #include "ChunkedList.hpp"
 
-#ifdef DEBUGGING
+#ifdef CHUNKED_LIST_DEBUGGING
 #include <iostream>
 #define DEBUG_LINE std::cout << std::endl;
 #define DEBUG_LOG(value) std::cout << value;
@@ -331,12 +331,12 @@ std::ostream &operator<<(std::ostream &os, ChunkedList<T, ChunkSize, ShouldCopy>
 }
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
-ChunkedList<T, ChunkSize, ShouldCopy>::iterator begin(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList) {
+ChunkedList<T, ChunkSize, ShouldCopy>::Iterator begin(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList) {
   return chunkedList.begin();
 }
 
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
-ChunkedList<T, ChunkSize, ShouldCopy>::iterator end(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList) {
+ChunkedList<T, ChunkSize, ShouldCopy>::Iterator end(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList) {
   return chunkedList.end();
 }

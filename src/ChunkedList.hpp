@@ -102,7 +102,7 @@ class ChunkedList {
 };
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
-ChunkedList<T, ChunkSize, ShouldCopy>::iterator begin(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList);
+ChunkedList<T, ChunkSize, ShouldCopy>::Iterator begin(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList);
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
-ChunkedList<T, ChunkSize, ShouldCopy>::iterator end(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList);
+ChunkedList<T, ChunkSize, ShouldCopy>::Iterator end(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList);
