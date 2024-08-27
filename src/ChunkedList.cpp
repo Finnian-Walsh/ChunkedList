@@ -1,4 +1,4 @@
-#include "../include/ChunkedList.hpp"
+#include "ChunkedList.hpp"
 
 #include <sstream>
 
@@ -233,7 +233,7 @@ typename ChunkedList<T, ChunkSize, ShouldCopy>::ChunkIterator ChunkedList<T, Chu
 }
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
-void ChunkedList<T, ChunkSize, ShouldCopy>::push(typename std::conditional<ShouldCopy, T, const T &> value) {
+void ChunkedList<T, ChunkSize, ShouldCopy>::push(ValueType value) {
   if constexpr (ShouldCopy)
     if (back->nextIndex == ChunkSize) {
       auto *nextChunk = new Chunk{value};
@@ -336,11 +336,28 @@ template<typename T, size_t ChunkSize, bool ShouldCopy>
 const char* ChunkedList<T, ChunkSize, ShouldCopy>::concat(const char* delimiter) {
   std::ostringstream concatenation;
   
-  for (typename std::conditional<ShouldCopy, T, const T &> v : *this) {
+  Iterator it{begin()};
+
+  for (; it != end() - 1; ++it)
     concatenation << v << delimiter;
-  }
   
+  concatenation << *++it;
+
   return concatenation.view().cbegin();
+}
+
+template<typename T, size_t ChunkSize, bool ShouldCopy>
+std::string ChunkedList<T, ChunkSize, ShouldCopy>::concat(const std::string& delimiter) {
+  std::ostringstream concatenation;
+  
+  Iterator it{begin()};
+
+  for (; it != end() - 1; ++it)
+    concatenation << v << delimiter;
+
+  concatenation << *++it;
+
+  return concatenation.str();
 }
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>

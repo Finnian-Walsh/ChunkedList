@@ -63,7 +63,9 @@ class ChunkedList {
     Chunk *back{nullptr};
     
     void pushChunk(Chunk *chunk);
-  
+    
+    using ValueType = decltype(ShouldCopy ? T : const T &>);
+
   public:
     ChunkedList();
     
@@ -82,8 +84,8 @@ class ChunkedList {
     ChunkIterator beginChunk();
     
     ChunkIterator endChunk();
-    
-    void push(typename std::conditional<ShouldCopy, T, const T &>);
+
+    void push(ValueType);
     
     void pop();
     
@@ -101,6 +103,8 @@ class ChunkedList {
     friend std::ostream &operator<<(std::ostream &os, ChunkedList &chunkedList);
     
     const char *concat(const char *delimiter);
+
+    std::string concat(const std::string& delimiter);
 };
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
