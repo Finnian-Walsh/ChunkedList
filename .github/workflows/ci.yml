@@ -1,0 +1,40 @@
+name: Run Tests
+
+on:
+  push:
+    branches:
+      - 'master'
+  pull_request:
+    branches:
+      - 'master'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up C++ (g++)
+        uses: actions/setup-cpp@v1
+        with:
+          compiler: g++-12
+      
+      - name: Install dependencies
+        run: sudo apt-get install -y cmake
+
+      - name: Create build directory
+        run: mkdir -p build
+        
+      - name: Configure with CMake
+        run: cmake -S . -B build
+
+      - name: Build with CMake
+        run: cmake --build debug --config Release
+
+      - name: Run tests with CTest
+        run: cd build && ctest --output-on-failure
+
+
+
