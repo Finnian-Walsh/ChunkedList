@@ -23,7 +23,11 @@ class ChunkedList {
         Chunk();
         
         ~Chunk();
-        
+
+        Chunk& operator+(size_t offset);
+
+        Chunk& operator-(size_t offset);
+
         int nextIndex{0};
         
         Chunk *nextChunk{nullptr};
@@ -33,32 +37,7 @@ class ChunkedList {
         
         const T &operator[](int index) const;
     };
-    
-    class Iterator {
-      public:
-        ~Iterator() = default;
-        
-        Iterator &operator++();
-        
-        Iterator operator++(int);
-        
-        Iterator &operator--();
-        
-        Iterator operator--(int);
-        
-        T &operator*();
-        
-        inline bool operator==(Iterator other);
-        
-        inline bool operator!=(Iterator other);
-      
-      private:
-        Chunk *chunk{nullptr};
-        int index{0};
-    };
-    
-    using ChunkIterator = const Chunk *;
-    
+
     Chunk *front{nullptr};
     Chunk *back{nullptr};
     
@@ -73,6 +52,75 @@ class ChunkedList {
     
     ~ChunkedList();
     
+    
+    class Iterator {
+      public:
+        ~Iterator();
+        
+        Iterator operator++();
+        
+        Iterator operator++(int);
+        
+        Iterator operator--();
+        
+        Iterator operator--(int);
+
+        Iterator operator+(size_t offset);
+
+        Iterator operator-(size_t offset);
+
+        inline Iterator operator+=(size_t offset);
+        
+        inline Iterator operator-=(size_t offset);
+        
+        T &operator*();
+        
+        inline bool operator==(Iterator other);
+        
+        inline bool operator!=(Iterator other);
+      private:
+        struct IteratorDummy {
+          Chunk* chunk{nullptr};
+          int index{0};
+        };
+
+        Chunk *chunk{nullptr};
+        int index{0};
+    };
+    
+    class ChunkIterator {
+      public:
+        ~ChunkIterator();
+        
+        ChunkIterator operator++();
+        
+        ChunkIterator operator++(int);
+
+        ChunkIterator operator--();
+
+        ChunkIterator operator--(int);
+
+        ChunkIterator operator+(size_t offset);
+
+        ChunkIterator operator-(size_t offset);
+
+        inline ChunkIterator operator+=(size_t offset);
+
+        inline ChunkIterator operator-=(size_t offset);
+
+        inline Chunk& operator*();
+
+        inline bool operator==(ChunkIterator other);
+
+        inline bool operator!=(ChunkIterator other);
+      private:
+        struct ChunkIteratorDummy {
+          Chunk* chunk{nullptr};
+        };
+
+        Chunk* chunk{nullptr};
+    };
+
     T &operator[](int index);
     
     const T &operator[](int index) const;
