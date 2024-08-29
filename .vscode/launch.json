@@ -1,0 +1,11 @@
+{
+  "configurations": [
+  {
+    "type": "cmake",
+    "request": "launch",
+    "name": "CMake: Script debugging",
+    "cmakeDebugType": "script",
+    "scriptPath": "${workspaceFolder}\\Test\\CMakeLists.txt"
+  }
+  ]
+}
