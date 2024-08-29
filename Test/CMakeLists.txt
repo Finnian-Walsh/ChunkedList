@@ -8,4 +8,4 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 add_executable(${PROJECT_NAME} ChunkedListTest.cpp
         ../src/ChunkedList.cpp)
 
-target_include_directories(../include)
+target_include_directories(${PROJECT_NAME} PRIVATE ../include)
