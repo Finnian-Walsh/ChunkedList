@@ -149,8 +149,8 @@ ChunkedList<T, ChunkSize, ShouldCopy>::Iterator::operator+(size_t offset) {
 
   size_t iteratorIndex = offset + index;
 
-  if (indexOffset >= ChunkSize) {
-    newIndex %= ChunkSize;
+  if (iteratorIndex >= ChunkSize) {
+    iteratorIndex %= ChunkSize;
     ++chunkOffset;
   }
 
@@ -163,14 +163,14 @@ ChunkedList<T, ChunkSize, ShouldCopy>::Iterator::operator-(size_t offset) {
   size_t chunkOffset = offset / ChunkSize;
   offset %= ChunkSize;
 
-  size_t iteratorIndex = offset + index;
+  size_t iteratorIndex = offset - index;
 
-  if (indexOffset >= ChunkSize) {
-    newIndex %= ChunkSize;
+  if (iteratorIndex >= ChunkSize) {
+    iteratorIndex %= ChunkSize;
     ++chunkOffset;
   }
 
-  return {&chunk->operator+(chunkOffset), iteratorIndex};
+  return {&chunk->operator-(chunkOffset), iteratorIndex};
 }
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
@@ -354,7 +354,7 @@ const T &ChunkedList<T, ChunkSize, ShouldCopy>::operator[](int index) const {
   for (int i = 0; i < chunkIndex; ++i)
     chunk = chunk->nextChunk;
   
-  return (*chunk)[](index % ChunkSize);
+  return (*chunk)(index % ChunkSize);
 }
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
@@ -484,11 +484,11 @@ const char* ChunkedList<T, ChunkSize, ShouldCopy>::concat(const char* delimiter)
   Iterator it{begin()};
 
   for (; it != end() - 1; ++it)
-    concatenation << v << delimiter;
+    concatenation << *it << delimiter;
   
   concatenation << *++it;
 
-  return concatenation.view().cbegin();
+  return concatenation.str().c_str();
 }
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
@@ -498,7 +498,7 @@ std::string ChunkedList<T, ChunkSize, ShouldCopy>::concat(const std::string& del
   Iterator it{begin()};
 
   for (; it != end() - 1; ++it)
-    concatenation << v << delimiter;
+    concatenation << *it << delimiter;
 
   concatenation << *++it;
 

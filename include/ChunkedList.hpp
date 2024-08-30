@@ -42,16 +42,14 @@ class ChunkedList {
     Chunk *back{nullptr};
     
     void pushChunk(Chunk *chunk);
-    
-    using ValueType = decltype(ShouldCopy ? T : const T &>);
 
+    using ValueType = typename std::conditional<ShouldCopy, T, const T&>::type;
   public:
     ChunkedList();
     
     ChunkedList(const std::initializer_list<T> &initializerList);
     
     ~ChunkedList();
-    
     
     class Iterator {
       public:
@@ -133,7 +131,7 @@ class ChunkedList {
     
     ChunkIterator endChunk();
 
-    void push(ValueType);
+    void push(ValueType value);
     
     void pop();
     
