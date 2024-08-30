@@ -1,11 +1,26 @@
 {
+  "version": "0.2.0",
   "configurations": [
-  {
-    "type": "cmake",
-    "request": "launch",
-    "name": "CMake: Script debugging",
-    "cmakeDebugType": "script",
-    "scriptPath": "${workspaceFolder}\\Test\\CMakeLists.txt"
-  }
+      {
+          "name": "Debug Test Executable",
+          "type": "cppdbg",
+          "request": "launch",
+          "program": "${workspaceFolder}/build/Test", // Path to the built executable
+          "args": [],
+          "stopAtEntry": false,
+          "cwd": "${workspaceFolder}",
+          "environment": [],
+          "externalConsole": false,
+          "MIMode": "gdb",
+          "setupCommands": [
+              {
+                  "description": "Enable pretty-printing for gdb",
+                  "ignoreFailures": true,
+                  "text": "-enable-pretty-printing"
+              }
+          ],
+          "preLaunchTask": "Pre-launch Tasks"
+          // "miDebuggerPath": "/usr/bin/gdb" // Update this path if necessary
+      }
   ]
 }
