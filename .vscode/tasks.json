@@ -1,0 +1,42 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+      {
+          "label": "Generate Build files",
+          "type": "process",
+          "command": "cmake",
+          "args": [
+              "-S Test",
+              "-B build"
+          ],
+          "group": {
+              "kind": "build",
+              "isDefault": true
+          },
+          "problemMatcher": []
+      },
+      {
+        "label": "CMake Build",
+        "type": "process",
+        "command": "cmake",
+        "args": [
+            "--build",
+            "build",
+        ],
+        "group": {
+            "kind": "build",
+            "isDefault": true
+        },
+        "problemMatcher": []
+    },
+    {
+      "label": "Pre-launch Tasks",
+      "dependsOn": [
+          "Generate Build files",
+          "CMake Build"
+      ],
+      "dependsOrder": "sequence",
+      "problemMatcher": []
+    }
+  ]
+}
