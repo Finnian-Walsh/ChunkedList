@@ -3,7 +3,7 @@
   "tasks": [
       {
           "label": "Generate Build files",
-          "type": "process",
+          "type": "shell",
           "command": "cmake",
           "args": [
               "-S Test",
@@ -17,7 +17,7 @@
       },
       {
         "label": "CMake Build",
-        "type": "process",
+        "type": "shell",
         "command": "cmake",
         "args": [
             "--build",
