@@ -52,12 +52,21 @@ Doing so will cause the **ChunkedList** operations to be outputted in the consol
 
 ## How to use
 
-- Download the libChunkedList.a file.
-- Create a new directory in your project, where you store your libraries, named ChunkedList.
-- Add another directory inside the ChunkedList directory named include, as well as lib.
-- Move the libChunkedList.a file inside the lib directory.
-- Create a new header file in your include directory and paste the ChunkedList.hpp source code.
-- Include the new header file you created in your code.
+### For Git
+
+Add the repository as a submodule.
+
+```bash
+git submodule add https://Finnian-Walsh/ChunkedList.git <path>
+```
+
+### For non-Git projects
+
+Ensure that your current path is set to your project's directory.
+
+```bash
+git clone https://Finnian-Walsh/ChunkedList.git
+```
 
 ## Coding examples:
 
