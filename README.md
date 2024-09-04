@@ -57,7 +57,7 @@ Doing so will cause the **ChunkedList** operations to be outputted in the consol
 Add the repository as a submodule.
 
 ```bash
-git submodule add https://Finnian-Walsh/ChunkedList.git <path>
+git submodule add https://github.com/Finnian-Walsh/ChunkedList.git <path>
 ```
 
 ### For non-Git projects
@@ -65,7 +65,7 @@ git submodule add https://Finnian-Walsh/ChunkedList.git <path>
 Ensure that your current path is set to your project's directory.
 
 ```bash
-git clone https://Finnian-Walsh/ChunkedList.git
+git clone https://github.com/Finnian-Walsh/ChunkedList.git
 ```
 
 ## Coding examples:
