@@ -239,7 +239,7 @@ class ChunkedList {
         }
         
         inline bool operator!=(Iterator other) {
-          return *reinterpret_cast<Chunk **>(&other)->chunk != chunk || *reinterpret_cast<int *>(sizeof(Chunk) + &other) != index;
+          return *reinterpret_cast<Chunk **>(&other) != chunk || *reinterpret_cast<int *>(sizeof(Chunk) + &other) != index;
         }
       
       private:
