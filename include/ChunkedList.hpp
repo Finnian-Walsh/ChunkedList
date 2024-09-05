@@ -235,14 +235,19 @@ class ChunkedList {
         }
         
         inline bool operator==(Iterator other) {
-          return *reinterpret_cast<Chunk **>(&other) == chunk && *reinterpret_cast<int *>(sizeof(Chunk *) + &other) == index;
+          return static_cast<Dummy *>(&other)->chunk == chunk && static_cast<Dummy *>(&other)->index == index;
         }
         
         inline bool operator!=(Iterator other) {
-          return *reinterpret_cast<Chunk **>(&other) != chunk || *reinterpret_cast<int *>(sizeof(Chunk) + &other) != index;
+          return static_cast<Dummy *>(&other)->chunk != chunk || static_cast<Dummy *>(&other)->index != index;
         }
       
       private:
+        struct Dummy {
+          Chunk *chunk{nullptr};
+          int index{0};
+        }
+
         Chunk *chunk{nullptr};
         int index{0};
     };
@@ -304,14 +309,18 @@ class ChunkedList {
         }
         
         inline bool operator==(ChunkIterator other) {
-          return *static_cast<Chunk **>(&other) == chunk;
+          return static_cast<Dummy *>(&other)->chunk == chunk;
         }
         
         inline bool operator!=(ChunkIterator other) {
-          return *static_cast<Chunk **>(&other) != chunk;
+          return static_cast<Dummy *>(&other)->chunk != chunk;
         }
       
       private:
+        struct Dummy {
+          Chunk *chunk{nullptr};
+        };
+
         Chunk *chunk{nullptr};
     };
     
