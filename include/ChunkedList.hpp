@@ -62,7 +62,7 @@ class ChunkedList {
         ~Chunk() = default;
         
         Chunk &operator+(size_t offset) {
-          Chunk *chunk{*this};
+          Chunk *chunk{this};
           
           for (size_t i{0}; i < offset; ++i)
             chunk = chunk->nextChunk;
@@ -71,7 +71,7 @@ class ChunkedList {
         }
         
         Chunk &operator-(size_t offset) {
-          Chunk *chunk{*this};
+          Chunk *chunk{this};
           
           for (size_t i{0}; i < offset; ++i)
             chunk = chunk->nextChunk;
