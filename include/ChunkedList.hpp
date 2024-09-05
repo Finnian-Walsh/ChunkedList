@@ -235,11 +235,11 @@ class ChunkedList {
         }
         
         inline bool operator==(Iterator other) {
-          return *static_cast<Chunk **>(&other) == chunk && *static_cast<int *>(sizeof(Chunk *) + &other) == index;
+          return *reinterpret_cast<Chunk **>(&other) == chunk && *reinterpret_cast<int *>(sizeof(Chunk *) + &other) == index;
         }
         
         inline bool operator!=(Iterator other) {
-          return *static_cast<Chunk **>(&other)->chunk != chunk || *static_cast<int *>(sizeof(Chunk) + &other) != index;
+          return *reinterpret_cast<Chunk **>(&other)->chunk != chunk || *reinterpret_cast<int *>(sizeof(Chunk) + &other) != index;
         }
       
       private:
