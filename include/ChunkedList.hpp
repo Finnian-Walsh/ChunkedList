@@ -1,4 +1,4 @@
-#pragma oncec
+#pragma once
 
 #include <sstream>
 #include <ostream>
@@ -336,7 +336,7 @@ class ChunkedList {
     }
     
     Iterator begin() {
-      return {back};
+      return {back, 0};
     }
     
     Iterator end() {
