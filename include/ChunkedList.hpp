@@ -288,7 +288,7 @@ class ChunkedList {
           for (size_t i = 0; i < offset; ++i)
             chunkRef = chunkRef.prevChunk;
           
-          return chunkRef;
+          return {chunkRef};
         }
         
         inline ChunkIterator operator+=(size_t offset) {
