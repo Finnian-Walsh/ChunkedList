@@ -68,7 +68,7 @@ Ensure that your current path is set to your project's directory.
 git clone https://github.com/Finnian-Walsh/ChunkedList.git
 ```
 
-## Coding examples:
+## Coding examples
 
 ```cpp
 #include "ChunkedList.hpp"
