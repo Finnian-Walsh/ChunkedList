@@ -5,8 +5,7 @@ project(ChunkedListTest VERSION 1.0)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-set(SRC_FILES ../src/ChunkedList.cpp
-        ChunkedListTest.cpp)
+set(SRC_FILES ChunkedListTest.cpp)
 
 include_directories(../include)
 
