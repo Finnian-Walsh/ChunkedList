@@ -212,11 +212,7 @@ class ChunkedList {
         }
       
       private:
-        struct Dummy {
-          Chunk *chunk{nullptr};
-        };
-
-        Chunk *chunk{nullptr};
+        Chunk *chunk;
     };
     
     class Iterator {
