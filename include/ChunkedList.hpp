@@ -1,6 +1,5 @@
 #pragma once
 
-#include <sstream>
 #include <ostream>
 #include <initializer_list>
 #include <cstring>
@@ -148,6 +147,78 @@ class ChunkedList {
       while (back) popChunk();
     }
     
+    class ChunkIterator {
+      public:
+        ~ChunkIterator() = default;
+        
+        ChunkIterator operator++() {
+          chunk = chunk->nextChunk;
+          return *this;
+        }
+        
+        ChunkIterator operator++(int) {
+          Iterator original = *this;
+          chunk = chunk->nextChunk;
+          return original;
+        }
+        
+        ChunkIterator operator--() {
+          chunk = chunk->prevChunk;
+          return *this;
+        }
+        
+        ChunkIterator operator--(int) {
+          Iterator original = *this;
+          chunk = chunk->prevChunk;
+          return original;
+        }
+        
+        ChunkIterator operator+(size_t offset) {
+          Chunk *ptr{chunk};
+          
+          for (; offset > 0; --offset)
+            ptr = chunkRef->nextChunk;
+          
+          return {ptr};
+        }
+        
+        ChunkIterator operator-(size_t offset) {
+          Chunk *ptr{chunk};
+          
+          for (; offset > 0; --offset)
+            ptr = ptr->prevChunk;
+          
+          return {ptr};
+        }
+        
+        inline ChunkIterator operator+=(size_t offset) {
+          return *this = operator+(offset);
+        }
+        
+        inline ChunkIterator operator-=(size_t offset) {
+          return *this = operator-(offset);
+        }
+        
+        inline Chunk &operator*() {
+          return *chunk;
+        }
+        
+        inline bool operator==(ChunkIterator other) {
+          return reinterpret_cast<Chunk *>(&other) == chunk;
+        }
+        
+        inline bool operator!=(ChunkIterator other) {
+          return reinterpret_cast<Chunk *>(&other) != chunk;
+        }
+      
+      private:
+        struct Dummy {
+          Chunk *chunk{nullptr};
+        };
+
+        Chunk *chunk{nullptr};
+    };
+    
     class Iterator {
       public:
         ~Iterator() = default;
@@ -235,95 +306,31 @@ class ChunkedList {
         }
         
         inline bool operator==(Iterator other) {
-          return static_cast<Dummy *>(&other)->chunk == chunk && static_cast<Dummy *>(&other)->index == index;
+          // return static_cast<Dummy *>(&other)->chunk == chunk && static_cast<Dummy *>(&other)->index == index;
+          return other.chunk == chunk && other.index == index;
         }
         
         inline bool operator!=(Iterator other) {
-          return static_cast<Dummy *>(&other)->chunk != chunk || static_cast<Dummy *>(&other)->index != index;
-        }
-      
-      private:
-        struct Dummy {
-          Chunk *chunk{nullptr};
-          int index{0};
+          // return static_cast<Dummy *>(&other)->chunk != chunk || static_cast<Dummy *>(&other)->index != index;
+          return other.chunk != chunk || other.index != index;
         }
 
-        Chunk *chunk{nullptr};
-        int index{0};
-    };
-    
-    class ChunkIterator {
-      public:
-        ~ChunkIterator() = default;
-        
-        ChunkIterator operator++() {
-          chunk = chunk->nextChunk;
-          return *this;
-        }
-        
-        ChunkIterator operator++(int) {
-          Iterator original = *this;
-          chunk = chunk->nextChunk;
-          return original;
-        }
-        
-        ChunkIterator operator--() {
-          chunk = chunk->prevChunk;
-          return *this;
-        }
-        
-        ChunkIterator operator--(int) {
-          Iterator original = *this;
-          chunk = chunk->prevChunk;
-          return original;
-        }
-        
-        ChunkIterator operator+(size_t offset) {
-          Chunk &chunkRef{chunk};
-          
-          for (size_t i = 0; i < offset; ++i)
-            chunkRef = chunkRef.nextChunk;
-          
-          return chunkRef;
-        }
-        
-        ChunkIterator operator-(size_t offset) {
-          Chunk &chunkRef{chunk};
-          
-          for (size_t i = 0; i < offset; ++i)
-            chunkRef = chunkRef.prevChunk;
-          
-          return {chunkRef};
-        }
-        
-        inline ChunkIterator operator+=(size_t offset) {
-          return *this = operator+(offset);
-        }
-        
-        inline ChunkIterator operator-=(size_t offset) {
-          return *this = operator-(offset);
-        }
-        
-        inline Chunk &operator*() {
-          return *chunk;
-        }
-        
-        inline bool operator==(ChunkIterator other) {
-          return static_cast<Dummy *>(&other)->chunk == chunk;
-        }
-        
-        inline bool operator!=(ChunkIterator other) {
-          return static_cast<Dummy *>(&other)->chunk != chunk;
-        }
-      
-      private:
-        struct Dummy {
-          Chunk *chunk{nullptr};
-        };
+        Iterator(Chunk *chunk) : chunkIterator{chunk} {}
 
-        Chunk *chunk{nullptr};
+        Iterator(Chunk *chunk, size_t index) : chunkIterator{chunk}, index{index} {}
+
+        Iterator(Chunk &chunk) : chunkIterator{&chunk} {}
+
+        Iterator(Chunk &chunk, size_t index) : chunkIterator(&chunk), index{index} {}
+
+        Iterator(ChunkIterator chunkIterator) : chunkIterator{chunkIterator} {}
+
+        Iterator(ChunkIterator chunkIterator, size_t index) : chunkIterator{chunkIterator}, index{index} {}
+      private:
+        ChunkIterator chunkIterator;
+        size_t index{0};
     };
-    
+
     T &operator[](size_t index) {
       const int chunkIndex = index / ChunkSize;
       Chunk *chunk = front;
