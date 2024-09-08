@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ostream>
+#include <sstream>
 #include <initializer_list>
 #include <cstring>
 
@@ -78,7 +78,7 @@ class ChunkedList {
           return *chunk;
         }
         
-        int nextIndex{0};
+        size_t nextIndex{0};
         
         Chunk *nextChunk{nullptr};
         Chunk *prevChunk{nullptr};
@@ -149,6 +149,8 @@ class ChunkedList {
     
     class ChunkIterator {
       public:
+        explicit ChunkIterator(Chunk *chunk) : chunk(chunk) {}
+
         ~ChunkIterator() = default;
         
         ChunkIterator operator++() {
@@ -211,6 +213,10 @@ class ChunkedList {
           return reinterpret_cast<Chunk *>(&other) != chunk;
         }
       
+        inline T &operator[](size_t index) {
+          return (*chunk)[index];
+        }
+
       private:
         Chunk *chunk;
     };
@@ -272,7 +278,7 @@ class ChunkedList {
             ++chunkOffset;
           }
           
-          return {&chunk->operator+(chunkOffset), iteratorIndex};
+          return {&(*chunkIterator + chunkOffset), iteratorIndex};
         }
         
         Iterator operator-(size_t offset) {
@@ -286,7 +292,7 @@ class ChunkedList {
             ++chunkOffset;
           }
           
-          return {&chunk->operator-(chunkOffset), iteratorIndex};
+          return {&(*chunkIterator - chunkOffset), iteratorIndex};
         }
         
         inline Iterator operator+=(size_t offset) {
@@ -298,30 +304,30 @@ class ChunkedList {
         }
         
         T &operator*() {
-          return (*chunk)[index];
+          return chunkIterator[index];
         }
         
         inline bool operator==(Iterator other) {
           // return static_cast<Dummy *>(&other)->chunk == chunk && static_cast<Dummy *>(&other)->index == index;
-          return other.chunk == chunk && other.index == index;
+          return *other.chunkIterator == chunk && other.index == index;
         }
         
         inline bool operator!=(Iterator other) {
           // return static_cast<Dummy *>(&other)->chunk != chunk || static_cast<Dummy *>(&other)->index != index;
-          return other.chunk != chunk || other.index != index;
+          return *other.chunkIterator != chunk || other.index != index;
         }
 
-        Iterator(Chunk *chunk) : chunkIterator{chunk} {}
+        Iterator(Chunk *chunk) : chunkIterator(chunk) {}
 
-        Iterator(Chunk *chunk, size_t index) : chunkIterator{chunk}, index{index} {}
+        Iterator(Chunk *chunk, size_t index) : chunkIterator(chunk), index(index) {}
 
-        Iterator(Chunk &chunk) : chunkIterator{&chunk} {}
+        Iterator(Chunk &chunk) : chunkIterator(&chunk) {}
 
-        Iterator(Chunk &chunk, size_t index) : chunkIterator(&chunk), index{index} {}
+        Iterator(Chunk &chunk, size_t index) : chunkIterator(&chunk), index(index) {}
 
-        Iterator(ChunkIterator chunkIterator) : chunkIterator{chunkIterator} {}
+        Iterator(ChunkIterator chunkIterator) : chunkIterator(*chunkIterator) {}
 
-        Iterator(ChunkIterator chunkIterator, size_t index) : chunkIterator{chunkIterator}, index{index} {}
+        Iterator(ChunkIterator chunkIterator, size_t index) : chunkIterator(*chunkIterator), index(index) {}
       private:
         ChunkIterator chunkIterator;
         size_t index{0};
