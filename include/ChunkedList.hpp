@@ -357,15 +357,31 @@ class ChunkedList {
       return {back, 0};
     }
     
+    const Iterator begin() {
+      return {back, 0};
+    }
+
     Iterator end() {
       return {front, front->nextIndex - 1};
     }
     
+    const Iterator end() {
+      return {front, front->nextIndex - 1};
+    }
+
     ChunkIterator beginChunk() {
       return {back};
     }
     
+    const ChunkIterator beginChunk() {
+      return {back};
+    }
+
     ChunkIterator endChunk() {
+      return {front + 1};
+    }
+    
+    const ChunkIterator endChunk() {
       return {front + 1};
     }
     
