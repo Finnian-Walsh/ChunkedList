@@ -6,7 +6,7 @@ A simple C++ list data structure, which uses **Chunks** to store data.
 
 ```cpp
 template<typename T, size_t ChunkSize = 32, bool ShouldCopy = false>
-class ChunkedList
+class ChunkedList;
 ```
 
 The **ChunkedList** data structure is essentially a linked list, where each node is a **Chunk**, as explained below.
@@ -45,16 +45,20 @@ ChunkedList<T, ChunkSize, ShouldCopy>::Iterator end(ChunkedList<T, ChunkSize, Sh
 
 ## Debugging
 
-If you wish to enable debugging mode for **ChunkedList** development, you can #define CHUNKED_LIST_DEBUGGING in
-src/ChunkedList.hpp if you are building the project manually, or download the debug libChunkedList.a file from the
-debugging release.
-Doing so will cause the **ChunkedList** operations to be outputted in the console.
+If you wish to enable debugging mode for **ChunkedList** development, you can add
+
+```cpp
+#define CHUNKED_LIST_DEBUGGING
+```
+
+in `src/ChunkedList.hpp` or before you include the header file. Doing so will cause the **ChunkedList** operations to be
+outputted in the console.
 
 ## How to use
 
 ### For Git
 
-Add the repository as a submodule.
+Simply add the repository as a submodule.
 
 ```bash
 git submodule add https://github.com/Finnian-Walsh/ChunkedList.git <path>
@@ -78,9 +82,10 @@ git clone https://github.com/Finnian-Walsh/ChunkedList.git
 int main() {
   ChunkedList<int> list{1, 2, 3, 4, 5};
   
-  for (int num : list) {
+  for (int num : list)
     std::cout << num << '\n';    
-  }
+    
+  return 0;
 }
 ```
 
@@ -100,4 +105,4 @@ int main() {
 ```
 
 Creates a **ChunkedList** populated with **std::string**s containing "hello" and "world" then joins each
-word in the list together with " ", subsequently outputting the returned **const char***.
+word in the list together with " ", subsequently outputting the returned **std::string***.
