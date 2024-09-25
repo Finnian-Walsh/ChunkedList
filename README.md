@@ -17,7 +17,7 @@ Each **Chunk** contains a fixed array, of size ChunkSize, and the **Chunk** clas
 the array in a different way. However,
 **Chunks** are abstracted away and from the user's view.
 
-Furthermore, each **Chunk** keep track of its next index, incrementing and decrementing it by 1 each push and pop
+Furthermore, each **Chunk** keeps track of its next index, incrementing and decrementing it by 1 each push and pop
 respectively.
 Therefore, calling the pop method on a **ChunkedList** doesn't deallocate anything unless the next index of the front
 **Chunk** is equal to 0, causing the entire Chunk and its contents to be deallocated.
