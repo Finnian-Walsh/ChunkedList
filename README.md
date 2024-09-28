@@ -58,7 +58,7 @@ outputted in the console.
 
 ### For Git
 
-Simply add the repository as a submodule.
+Add the repository as a submodule.
 
 ```bash
 git submodule add https://github.com/Finnian-Walsh/ChunkedList.git <path>
