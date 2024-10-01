@@ -9,6 +9,7 @@ set(SRC_FILES ChunkedListTest.cpp
         ../src/ChunkedList.tpp
         ../src/ChunkedListIterator.tpp
         ../src/ChunkedListChunk.tpp
+        ../src/ChunkedListUtility.tpp
 )
 
 include_directories(../include)
