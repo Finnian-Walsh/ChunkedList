@@ -4,6 +4,10 @@
 #include <sstream>
 #include <initializer_list>
 #include <cstring>
+#include <algorithm>
+#include <functional>
+#include <queue>
+#include <vector>
 
 #ifdef CHUNKED_LIST_DEBUGGING
 #include <iostream>
@@ -59,15 +63,23 @@ class ChunkedList {
         const T &operator[](size_t index) const {
           return data[index];
         }
+        
+        bool operator==(Chunk &other) {
+          return this == &other;
+        }
+        
+        bool operator!=(Chunk &other) {
+          return this == &other;
+        }
     };
     
     Chunk *front{nullptr};
     Chunk *back{nullptr};
     
     void pushChunk(Chunk *chunk);
-    
-    using ValueType = typename std::conditional<ShouldCopy, T, const T &>::type;
   public:
+    using ValueType = typename std::conditional_t<ShouldCopy, T, const T &>;
+    
     ChunkedList();
     
     [[maybe_unused]] [[maybe_unused]] ChunkedList(const std::initializer_list<T> &initializerList);
@@ -159,100 +171,48 @@ class ChunkedList {
         const T &operator[](size_t index) const {
           return (*chunk)[index];
         }
+        
+        bool operator==(ChunkIterator other) {
+          return chunk == other.chunk;
+        }
       
+        bool operator!=(ChunkIterator other) {
+          return chunk == other.chunk;
+        }
+        
       private:
         Chunk *chunk;
     };
     
     class Iterator {
       public:
-        Iterator(Chunk *chunk, size_t index) : chunkIterator(chunk), index(index) {}
+        Iterator(Chunk *chunk, size_t index);
         
-        explicit Iterator(Chunk &chunk) : chunkIterator(&chunk) {}
+        explicit Iterator(Chunk &chunk);
         
-        Iterator(Chunk &chunk, size_t index) : chunkIterator(&chunk), index(index) {}
+        Iterator(Chunk &chunk, size_t index);
         
-        explicit Iterator(ChunkIterator chunkIterator) : chunkIterator(*chunkIterator) {}
+        explicit Iterator(ChunkIterator chunkIterator);
         
-        Iterator(ChunkIterator chunkIterator, size_t index) : chunkIterator(*chunkIterator), index(index) {}
+        Iterator(ChunkIterator chunkIterator, size_t index);
         
-        ~Iterator() = default;
+        ~Iterator();
         
-        Iterator operator++() {
-          if (index == ChunkSize) {
-            index = 0;
-            ++chunkIterator;
-          } else {
-            ++index;
-          }
-          return *this;
-        }
+        Iterator operator++();
         
-        Iterator operator++(int) {
-          Iterator original = *this;
-          if (index == ChunkSize) {
-            index = 0;
-            ++chunkIterator;
-          } else {
-            ++index;
-          }
-          return original;
-        }
+        Iterator operator++(int);
         
-        Iterator operator--() {
-          if (index == 0) {
-            index = ChunkSize - 1;
-            --chunkIterator;
-          } else {
-            --index;
-          }
-          return *this;
-        }
+        Iterator operator--();
         
-        Iterator operator--(int) {
-          Iterator original = *this;
-          if (index == 0) {
-            index = ChunkSize - 1;
-            --chunkIterator;
-          } else {
-            --index;
-          }
-          return original;
-        }
+        Iterator operator--(int);
         
-        Iterator operator+(size_t offset) {
-          size_t chunkOffset = offset / ChunkSize;
-          offset %= ChunkSize;
-          
-          size_t iteratorIndex = offset + index;
-          
-          if (iteratorIndex >= ChunkSize) {
-            iteratorIndex %= ChunkSize;
-            ++chunkOffset;
-          }
-          
-          return Iterator{&(*chunkIterator + chunkOffset), iteratorIndex};
-        }
+        Iterator operator+(size_t offset);
         
-        Iterator operator-(size_t offset) {
-          size_t chunkOffset = offset / ChunkSize;
-          offset %= ChunkSize;
-          
-          size_t iteratorIndex = offset - index;
-          
-          if (iteratorIndex >= ChunkSize) {
-            iteratorIndex %= ChunkSize;
-            ++chunkOffset;
-          }
-          
-          return Iterator{&(*chunkIterator - chunkOffset), iteratorIndex};
-        }
+        Iterator operator-(size_t offset);
         
-        inline Iterator operator+=(size_t offset) {
-          return *this = operator+(offset);
-        }
+        Iterator operator+=(size_t offset);
         
-        inline Iterator operator-=(size_t offset) {
+        Iterator operator-=(size_t offset) {
           return *this = operator-(offset);
         }
         
@@ -356,8 +316,13 @@ class ChunkedList {
     template<typename, size_t, bool>
     friend std::ostream &operator<<(std::ostream &os, ChunkedList &chunkedList);
     
-    template<typename StringT = std::string, typename DelimiterT = const char *>
-    StringT concat(DelimiterT delimiter);
+    template<
+    typename OutputStream = std::ostringstream,
+    typename StringType = std::string,
+    typename SeparatorType = std::string,
+    StringType(*ConversionCall)(OutputStream &) = nullptr
+    >
+    StringType concat(SeparatorType separator);
 };
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
