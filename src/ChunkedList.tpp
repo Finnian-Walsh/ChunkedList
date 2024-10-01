@@ -1,7 +1,8 @@
 #pragma once
 
 #include "ChunkedList.hpp"
-#include "DebuggingMacros.hpp"
+#include "ChunkedListMacros.hpp"
+#include "ChunkedListUtility.hpp"
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
 void ChunkedList<T, ChunkSize, ShouldCopy>::pushChunk(Chunk *chunk) {
@@ -129,15 +130,13 @@ std::ostream &operator<<(std::ostream &os, ChunkedList<T, ChunkSize, ShouldCopy>
   DEBUG_EXECUTE(os << "Chunked List: ";)
   os << '[';
   DEBUG_EXECUTE({ os << '\n'; })
-  auto *chunk = chunkedList.front;
   
-  while (chunk) {
+  for (auto chunkIterator = chunkedList.beginChunk(); chunkIterator != chunkedList.endChunk(); ++chunkIterator) {
     DEBUG_LOG("Next index: " << chunk->nextIndex << '\n')
     
-    for (int i = 0; i < chunk->nextIndex; ++i)
-      os << ' ' << (*chunk)[i] << ',';
+    for (int i = 0; i < chunkIterator->nextIndex; ++i)
+      os << ' ' << (*chunkIterator)[i] << ',';
     
-    chunk = chunk->nextChunk;
     DEBUG_EXECUTE({ os << '\n'; })
   }
   
@@ -147,21 +146,27 @@ std::ostream &operator<<(std::ostream &os, ChunkedList<T, ChunkSize, ShouldCopy>
 }
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
-template<typename StringT, typename DelimiterT>
-StringT ChunkedList<T, ChunkSize, ShouldCopy>::concat(DelimiterT delimiter) {
-  std::ostringstream concatenation;
+template<typename OutputStream, typename StringType, typename SeparatorType, StringType(*ConversionCall)(OutputStream &)>
+StringType ChunkedList<T, ChunkSize, ShouldCopy>::concat(const SeparatorType separator) {
+  static_assert(ChunkedListUtility::has_insertion_operator_v<OutputStream, StringType>, "OutputStream cannot handle StringType");
+  static_assert(ChunkedListUtility::has_insertion_operator_v<OutputStream, StringType>, "OutputStream cannot handle SeparatorType");
   
-  Iterator it{begin()};
+  OutputStream stream;
   
-  for (; it != end() - 1; ++it)
-    concatenation << *it << delimiter;
+  Iterator it = begin(), lastIt = end() - 1;
   
-  concatenation << *++it;
+  if (it == lastIt) return StringType{};
+
+  std::for_each(it, lastIt, [&stream, separator](ValueType v) mutable {
+    stream << v << separator;
+  });
   
-  if constexpr (std::is_same_v<StringT, std::string>) {
-    return concatenation.str();
+  stream << *++lastIt;
+  
+  if constexpr (ConversionCall == nullptr) {
+    return StringType{stream.str()};
   } else {
-    return StringT{concatenation};
+    return ConversionCall(stream);
   }
 }
 

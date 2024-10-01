@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ChunkedList.hpp"
-#include "DebuggingMacros.hpp"
+#include "ChunkedListMacros.hpp"
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
 ChunkedList<T, ChunkSize, ShouldCopy>::Chunk::Chunk(const T *array, int size, Chunk *nextChunk,
