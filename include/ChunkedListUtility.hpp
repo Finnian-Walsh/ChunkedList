@@ -4,30 +4,6 @@
 #include "ChunkedList.hpp"
 
 namespace ChunkedListUtility {
-  template<typename T>
-  class ComparisonPointer {
-    private:
-      const T *ptr;
-    public:
-      explicit ComparisonPointer(const T *ptr) : ptr{ptr} {}
-      
-      bool operator==(ComparisonPointer<T> other);
-      
-      bool operator!=(ComparisonPointer<T> other);
-      
-      bool operator<(ComparisonPointer<T> other);
-      
-      bool operator<=(ComparisonPointer<T> other);
-      
-      bool operator>(ComparisonPointer<T> other);
-      
-      bool operator>=(ComparisonPointer<T> other);
-      
-      const T &operator*();
-      
-      const T *operator->();
-  };
-  
   template<typename, typename, typename = void>
   class has_insertion_operator : public std::false_type {
   };
@@ -43,9 +19,6 @@ namespace ChunkedListUtility {
   
   template<bool AscendingOrder = true, typename T, size_t ChunkSize, bool ShouldCopy>
   void sort(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList);
-  
-  template<typename T, bool ShouldCopy>
-  using QueueType = std::conditional_t<ShouldCopy, T, ComparisonPointer<T>>;
   
   template<typename T, bool AscendingOrder>
   using CompareClass = std::conditional_t<AscendingOrder, std::greater<T>, std::less<T>>;
