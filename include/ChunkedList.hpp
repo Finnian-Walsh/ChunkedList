@@ -56,21 +56,13 @@ class ChunkedList {
         Chunk *nextChunk{nullptr};
         Chunk *prevChunk{nullptr};
         
-        T &operator[](size_t index) {
-          return data[index];
-        }
+        T &operator[](size_t index);
         
-        const T &operator[](size_t index) const {
-          return data[index];
-        }
+        const T &operator[](size_t index) const;
         
-        bool operator==(Chunk &other) {
-          return this == &other;
-        }
+        bool operator==(const Chunk &other) const;
         
-        bool operator!=(Chunk &other) {
-          return this == &other;
-        }
+        bool operator!=(const Chunk &other) const;
     };
     
     Chunk *front{nullptr};
@@ -186,6 +178,8 @@ class ChunkedList {
     
     class Iterator {
       public:
+        explicit Iterator(Chunk *chunk);
+        
         Iterator(Chunk *chunk, size_t index);
         
         explicit Iterator(Chunk &chunk);
@@ -212,16 +206,56 @@ class ChunkedList {
         
         Iterator operator+=(size_t offset);
         
-        Iterator operator-=(size_t offset) {
+        Iterator operator-=(size_t offset);
+        
+        T &operator*();
+        
+        T *operator->();
+        
+        const T &operator*() const;
+        
+        const T *operator->() const;
+        
+        bool operator==(Iterator other) const;
+        
+        bool operator!=(Iterator other) const;
+      private:
+        ChunkIterator chunkIterator;
+        size_t index{0};
+    };
+    
+    class ConstIterator {
+      public:
+        explicit ConstIterator(Chunk *chunk);
+        
+        ConstIterator(Chunk *chunk, size_t index);
+        
+        explicit ConstIterator(Chunk &chunk);
+        
+        ConstIterator(Chunk &chunk, size_t index);
+        
+        explicit ConstIterator(ChunkIterator chunkIterator);
+        
+        ConstIterator(ChunkIterator chunkIterator, size_t index);
+        
+        ~ConstIterator();
+        
+        ConstIterator operator++() const;
+        
+        ConstIterator operator++(int) const;
+        
+        ConstIterator operator--() const;
+        
+        ConstIterator operator--(int) const;
+        
+        ConstIterator operator+(size_t offset) const;
+        
+        ConstIterator operator-(size_t offset) const;
+        
+        ConstIterator operator+=(size_t offset) const;
+        
+        ConstIterator operator-=(size_t offset) const {
           return *this = operator-(offset);
-        }
-        
-        T &operator*() {
-          return chunkIterator[index];
-        }
-        
-        T *operator->() {
-          return &chunkIterator[index];
         }
         
         const T &operator*() const {
@@ -235,9 +269,6 @@ class ChunkedList {
         inline bool operator!=(const Iterator other) const {
           return other.chunkIterator != chunkIterator || other.index != index;
         }
-        
-        explicit Iterator(Chunk *chunk) : chunkIterator(chunk) {}
-      
       private:
         ChunkIterator chunkIterator;
         size_t index{0};
@@ -273,35 +304,11 @@ class ChunkedList {
       return ChunkIterator{back};
     }
     
-    ChunkIterator endChunk() {
-      return ChunkIterator{front + 1};
-    }
+    ChunkIterator endChunk();
     
-    const ChunkIterator endChunk() const {
-      return ChunkIterator{front + 1};
-    }
+    [[nodiscard]] const ChunkIterator endChunk() const;
     
-    void push(ValueType value) {
-      if (back->nextIndex == ChunkSize) {
-        if constexpr (ShouldCopy) {
-          auto *nextChunk = new Chunk{std::move(value)};
-          nextChunk->prevChunk = back;
-          back->nextChunk = nextChunk;
-          back = nextChunk;
-        } else {
-          auto *nextChunk = new Chunk{value};
-          nextChunk->prevChunk = back;
-          back->nextChunk = nextChunk;
-          back = nextChunk;
-        }
-      } else {
-        if constexpr (ShouldCopy)
-          (*back)[back->nextIndex] = std::move(value);
-        else
-          (*back)[back->nextIndex] = value;
-        ++back->nextIndex;
-      }
-    }
+    void push(ValueType value);
     
     void pop();
     

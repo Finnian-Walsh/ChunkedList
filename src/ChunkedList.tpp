@@ -80,6 +80,39 @@ const T &ChunkedList<T, ChunkSize, ShouldCopy>::operator[](size_t index) const {
 }
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
+const ChunkedList<T, ChunkSize, ShouldCopy>::ChunkIterator ChunkedList<T, ChunkSize, ShouldCopy>::endChunk() const {
+  return ChunkIterator{front + 1};
+}
+
+template<typename T, size_t ChunkSize, bool ShouldCopy>
+ChunkedList<T, ChunkSize, ShouldCopy>::ChunkIterator ChunkedList<T, ChunkSize, ShouldCopy>::endChunk() {
+  return ChunkIterator{front + 1};
+}
+
+template<typename T, size_t ChunkSize, bool ShouldCopy>
+void ChunkedList<T, ChunkSize, ShouldCopy>::push(ValueType value) {
+  if (back->nextIndex == ChunkSize) {
+    if constexpr (ShouldCopy) {
+      auto *nextChunk = new Chunk{std::move(value)};
+      nextChunk->prevChunk = back;
+      back->nextChunk = nextChunk;
+      back = nextChunk;
+    } else {
+      auto *nextChunk = new Chunk{value};
+      nextChunk->prevChunk = back;
+      back->nextChunk = nextChunk;
+      back = nextChunk;
+    }
+  } else {
+    if constexpr (ShouldCopy)
+      (*back)[back->nextIndex] = std::move(value);
+    else
+      (*back)[back->nextIndex] = value;
+    ++back->nextIndex;
+  }
+}
+
+template<typename T, size_t ChunkSize, bool ShouldCopy>
 void ChunkedList<T, ChunkSize, ShouldCopy>::pop() {
   if (back->nextIndex == 0)
     popChunk();
@@ -146,17 +179,20 @@ std::ostream &operator<<(std::ostream &os, ChunkedList<T, ChunkSize, ShouldCopy>
 }
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
-template<typename OutputStream, typename StringType, typename SeparatorType, StringType(*ConversionCall)(OutputStream &)>
+template<typename OutputStream, typename StringType, typename SeparatorType, StringType(*ConversionCall)(
+OutputStream &)>
 StringType ChunkedList<T, ChunkSize, ShouldCopy>::concat(const SeparatorType separator) {
-  static_assert(ChunkedListUtility::has_insertion_operator_v<OutputStream, StringType>, "OutputStream cannot handle StringType");
-  static_assert(ChunkedListUtility::has_insertion_operator_v<OutputStream, StringType>, "OutputStream cannot handle SeparatorType");
+  static_assert(ChunkedListUtility::has_insertion_operator_v<OutputStream, StringType>,
+                "OutputStream cannot handle StringType");
+  static_assert(ChunkedListUtility::has_insertion_operator_v<OutputStream, StringType>,
+                "OutputStream cannot handle SeparatorType");
   
   OutputStream stream;
   
   Iterator it = begin(), lastIt = end() - 1;
   
   if (it == lastIt) return StringType{};
-
+  
   std::for_each(it, lastIt, [&stream, separator](ValueType v) mutable {
     stream << v << separator;
   });
