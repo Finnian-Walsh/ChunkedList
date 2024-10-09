@@ -13,6 +13,13 @@
 #include <iostream>
 #endif
 
+#ifdef IMPLEMENT_CHUNKED_LIST_PRIVATELY
+
+namespace ChunkedListUtility {
+  namespace ChunkedListImplementation {
+
+#endif
+
 template<typename T, size_t ChunkSize = 32, bool ShouldCopy = true>
 class ChunkedList {
     static_assert(ChunkSize > 0, "Chunk Size must be greater than 0");
@@ -20,7 +27,7 @@ class ChunkedList {
     size_t chunkCount{1};
     
     class Chunk {
-        T data[ChunkSize];
+        T data[ChunkSize]{};
       
       public:
         Chunk(Chunk *nextChunk, Chunk *prevChunk) : nextChunk(nextChunk), prevChunk(prevChunk) {}
@@ -29,9 +36,9 @@ class ChunkedList {
         
         Chunk(const std::initializer_list<T> &initializerList);
         
-        Chunk();
+        Chunk() = default;
         
-        ~Chunk();
+        ~Chunk() = default;
         
         Chunk &operator+(size_t offset) {
           Chunk *chunk{this};
@@ -69,12 +76,13 @@ class ChunkedList {
     Chunk *back{nullptr};
     
     void pushChunk(Chunk *chunk);
+  
   public:
     using ValueType = typename std::conditional_t<ShouldCopy, T, const T &>;
     
     ChunkedList();
     
-    [[maybe_unused]] [[maybe_unused]] ChunkedList(const std::initializer_list<T> &initializerList);
+    [[maybe_unused]] ChunkedList(const std::initializer_list<T> &initializerList);
     
     ~ChunkedList();
     
@@ -167,14 +175,16 @@ class ChunkedList {
         bool operator==(ChunkIterator other) {
           return chunk == other.chunk;
         }
-      
+        
         bool operator!=(ChunkIterator other) {
           return chunk == other.chunk;
         }
-        
+      
       private:
         Chunk *chunk;
     };
+    
+    class ConstIterator;
     
     class Iterator {
       public:
@@ -190,7 +200,7 @@ class ChunkedList {
         
         Iterator(ChunkIterator chunkIterator, size_t index);
         
-        ~Iterator();
+        ~Iterator() = default;
         
         Iterator operator++();
         
@@ -218,7 +228,12 @@ class ChunkedList {
         
         bool operator==(Iterator other) const;
         
+        bool operator==(ConstIterator other) const;
+        
         bool operator!=(Iterator other) const;
+        
+        bool operator!=(ConstIterator other) const;
+      
       private:
         ChunkIterator chunkIterator;
         size_t index{0};
@@ -238,37 +253,36 @@ class ChunkedList {
         
         ConstIterator(ChunkIterator chunkIterator, size_t index);
         
-        ~ConstIterator();
+        ~ConstIterator() = default;
         
-        ConstIterator operator++() const;
+        ConstIterator operator++();
         
-        ConstIterator operator++(int) const;
+        ConstIterator operator++(int);
         
-        ConstIterator operator--() const;
+        ConstIterator operator--();
         
-        ConstIterator operator--(int) const;
+        ConstIterator operator--(int);
         
         ConstIterator operator+(size_t offset) const;
         
         ConstIterator operator-(size_t offset) const;
         
-        ConstIterator operator+=(size_t offset) const;
+        ConstIterator operator+=(size_t offset);
         
-        ConstIterator operator-=(size_t offset) const {
-          return *this = operator-(offset);
-        }
+        ConstIterator operator-=(size_t offset);
         
-        const T &operator*() const {
-          return chunkIterator[index];
-        }
+        const T &operator*() const;
         
-        inline bool operator==(const Iterator other) const {
-          return other.chunkIterator == chunkIterator && other.index == index;
-        }
+        const T *operator->() const;
         
-        inline bool operator!=(const Iterator other) const {
-          return other.chunkIterator != chunkIterator || other.index != index;
-        }
+        bool operator==(ConstIterator other) const;
+        
+        bool operator==(Iterator other) const;
+        
+        bool operator!=(ConstIterator other) const;
+        
+        bool operator!=(Iterator other) const;
+      
       private:
         ChunkIterator chunkIterator;
         size_t index{0};
@@ -280,39 +294,28 @@ class ChunkedList {
     
     const T &operator[](size_t index) const;
     
-    Iterator begin() {
-      return Iterator{back, 0};
-    }
+    Iterator begin();
     
-    const Iterator begin() const {
-      return Iterator{back, 0};
-    }
+    [[nodiscard]] ConstIterator begin() const;
     
-    Iterator end() {
-      return Iterator{front, front->nextIndex - 1};
-    }
+    Iterator end();
     
-    const Iterator end() const {
-      return Iterator{front, front->nextIndex - 1};
-    }
+    [[nodiscard]] ConstIterator end() const;
     
-    ChunkIterator beginChunk() {
-      return ChunkIterator{back};
-    }
-    
-    const ChunkIterator beginChunk() const {
-      return ChunkIterator{back};
-    }
+    ChunkIterator beginChunk();
     
     ChunkIterator endChunk();
-    
-    [[nodiscard]] const ChunkIterator endChunk() const;
     
     void push(ValueType value);
     
     void pop();
     
     void popChunk();
+    
+    template<bool AscendingOrder = true>
+    void sort();
+    
+    void sort(bool ascendingOrder);
     
     [[nodiscard]] size_t size() const;
     
@@ -333,16 +336,12 @@ class ChunkedList {
 };
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
-auto begin(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList) noexcept -> decltype(chunkedList.begin());
+ChunkedList<T, ChunkSize, ShouldCopy>::ConstIterator
+begin(const ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList) noexcept;
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
-auto begin(const ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList) noexcept -> decltype(chunkedList.begin());
-
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-auto end(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList) noexcept -> decltype(chunkedList.end());
-
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-auto end(const ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList) noexcept -> decltype(chunkedList.end());
+ChunkedList<T, ChunkSize, ShouldCopy>::ConstIterator
+end(const ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList) noexcept;
 
 #undef DEBUG_LOG
 #undef DEBUG_LINE
@@ -351,5 +350,9 @@ auto end(const ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList) noexcept -> d
 #include "../src/ChunkedList.tpp"
 #include "../src/ChunkedListChunk.tpp"
 #include "../src/ChunkedListIterator.tpp"
+
+#ifdef IMPLEMENT_CHUNKED_LIST_PRIVATELY
+}}
+#endif
 
 #endif
