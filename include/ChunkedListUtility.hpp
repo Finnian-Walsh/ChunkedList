@@ -17,11 +17,11 @@ namespace ChunkedListUtility {
   template<typename Class, typename Parameter>
   constexpr bool has_insertion_operator_v = has_insertion_operator<Class, Parameter>::value;
   
-  template<bool AscendingOrder = true, typename T, size_t ChunkSize, bool ShouldCopy>
-  void sort(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList);
+  template<typename T, size_t ChunkSize, bool ShouldCopy>
+  void ascendingSort(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList);
   
-  template<typename T, bool AscendingOrder>
-  using CompareClass = std::conditional_t<AscendingOrder, std::greater<T>, std::less<T>>;
+  template<typename T, size_t ChunkSize, bool ShouldCopy>
+  void descendingSort(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList);
 }
 
 #include "../src/ChunkedListUtility.tpp"
@@ -29,7 +29,7 @@ namespace ChunkedListUtility {
 void test_function() {
   ChunkedList<int, 32, false> list;
   
-  ChunkedListUtility::sort(list);
+  list.sort();
 }
 
 #endif
