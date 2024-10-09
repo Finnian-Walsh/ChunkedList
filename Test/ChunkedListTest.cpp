@@ -6,7 +6,7 @@
 #include <random>
 
 template<size_t ChunkSize = 32, typename T = int, bool ShouldCopy = false>
-using StandardChunkedList = ChunkedList<T, ChunkSize, ShouldCopy>;
+using TestChunkedList = ChunkedList<T, ChunkSize, ShouldCopy>;
 
 #define BEGIN int testNumber{1}; std::cout << "Starting tests..." << std::endl
 #define CALL_TEST(functionName, functionPtr) callFunction(functionName, functionPtr); std::cout << "Test " << testNumber << " successful." << std::endl; ++testNumber;
@@ -37,7 +37,7 @@ int main() {
   BEGIN;
   
   CALL_TEST("Front and back", ([]() -> Result {
-    using List = StandardChunkedList<2>;
+    using List = TestChunkedList<2>;
     List chunkedList{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
     
     int chunkIndex{};
@@ -59,7 +59,7 @@ int main() {
   
   CALL_TEST("Sorting", ([]() -> Result {
     int num{};
-    StandardChunkedList list{};
+    TestChunkedList list{};
     std::mt19937 gen{std::random_device{}()};
     std::uniform_int_distribution<> distribution{1, 100};
     
@@ -67,11 +67,11 @@ int main() {
       list.push(distribution(gen));
     }
     
-    ChunkedListUtility::sort(list);
+    list.sort();
     
     int last = list[0];
     
-    for (auto iterator = list.begin() + 1; iterator != list.end(); ++iterator) {
+    for (auto iterator = list.begin().operator+(1); iterator != list.end(); ++iterator) {
       if (*iterator < last) {
         return Result{std::string{"Sorting failed!"}};
       }
@@ -84,7 +84,7 @@ int main() {
   
   CALL_TEST("Iterators", ([]() -> Result {
     std::cout << "creating list\n";
-    StandardChunkedList chunkedList{1, 2, 3, 4, 5};
+    TestChunkedList chunkedList{1, 2, 3, 4, 5};
     int total{};
     
     std::cout << "iterating...\n";
@@ -96,7 +96,7 @@ int main() {
   }))
   
   CALL_TEST("Pushing and popping", ([]() -> Result {
-    StandardChunkedList<4, char> chunkedList{};
+    TestChunkedList<4, char> chunkedList{};
     
     for (int i = 0; i < 10; ++i) {
       chunkedList.push('a');
@@ -113,7 +113,8 @@ int main() {
   }))
   
   CALL_TEST("Equality and inequality", ([]() -> Result {
-    StandardChunkedList list1{}, list2{};
+    TestChunkedList list1{};
+    TestChunkedList list2;
     
     list1.push(1);
     list1.push(2);
@@ -151,7 +152,7 @@ int main() {
   }))
 
   CALL_TEST("Concatenation and indexing", ([]() -> Result {
-    StandardChunkedList<2> chunkedList;
+    TestChunkedList<2> chunkedList;
 
     for (int i{}; i < 10; ++i)
       chunkedList.push(i);
