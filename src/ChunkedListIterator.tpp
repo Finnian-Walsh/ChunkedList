@@ -38,7 +38,7 @@ ChunkedList<T, ChunkSize, ShouldCopy>::Iterator::Iterator(ChunkIterator chunkIte
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
 ChunkedList<T, ChunkSize, ShouldCopy>::Iterator ChunkedList<T, ChunkSize, ShouldCopy>::Iterator::operator++() {
-  if (index == ChunkSize) {
+  if (index == (ChunkSize - 1)) {
     index = 0;
     ++chunkIterator;
   } else {
@@ -52,7 +52,7 @@ template<typename T, size_t ChunkSize, bool ShouldCopy>
 ChunkedList<T, ChunkSize, ShouldCopy>::Iterator ChunkedList<T, ChunkSize, ShouldCopy>::Iterator::operator++(int) {
   Iterator original = *this;
   
-  if (index == ChunkSize) {
+  if (index == (ChunkSize - 1)) {
     index = 0;
     ++chunkIterator;
   } else {
@@ -77,12 +77,14 @@ ChunkedList<T, ChunkSize, ShouldCopy>::Iterator ChunkedList<T, ChunkSize, Should
 template<typename T, size_t ChunkSize, bool ShouldCopy>
 ChunkedList<T, ChunkSize, ShouldCopy>::Iterator ChunkedList<T, ChunkSize, ShouldCopy>::Iterator::operator--(int) {
   Iterator original = *this;
+  
   if (index == 0) {
     index = ChunkSize - 1;
     --chunkIterator;
   } else {
     --index;
   }
+  
   return original;
 }
 
@@ -208,7 +210,7 @@ ChunkedList<T, ChunkSize, ShouldCopy>::ConstIterator::ConstIterator(ChunkIterato
 template<typename T, size_t ChunkSize, bool ShouldCopy>
 ChunkedList<T, ChunkSize, ShouldCopy>::ConstIterator
 ChunkedList<T, ChunkSize, ShouldCopy>::ConstIterator::operator++() {
-  if (index == ChunkSize) {
+  if (index == (ChunkSize - 1)) {
     index = 0;
     ++chunkIterator;
   } else {
@@ -223,7 +225,7 @@ ChunkedList<T, ChunkSize, ShouldCopy>::ConstIterator
 ChunkedList<T, ChunkSize, ShouldCopy>::ConstIterator::operator++(int) {
   ConstIterator original = *this;
   
-  if (index == ChunkSize) {
+  if (index == (ChunkSize - 1)) {
     index = 0;
     ++chunkIterator;
   } else {
