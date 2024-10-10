@@ -81,53 +81,53 @@ const T &ChunkedList<T, ChunkSize, ShouldCopy>::operator[](size_t index) const {
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
 ChunkedList<T, ChunkSize, ShouldCopy>::Iterator ChunkedList<T, ChunkSize, ShouldCopy>::begin() {
-  return Iterator{back, 0};
+  return Iterator{front, 0};
 }
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
 ChunkedList<T, ChunkSize, ShouldCopy>::ConstIterator ChunkedList<T, ChunkSize, ShouldCopy>::begin() const {
-  return ConstIterator{back, 0};
+  return ConstIterator{front, 0};
 }
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
 ChunkedList<T, ChunkSize, ShouldCopy>::Iterator ChunkedList<T, ChunkSize, ShouldCopy>::end() {
-  return Iterator{front, front->nextIndex - 1};
+  return Iterator{back, back->nextIndex};
 }
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
 ChunkedList<T, ChunkSize, ShouldCopy>::ConstIterator ChunkedList<T, ChunkSize, ShouldCopy>::end() const {
-  return ConstIterator{front, front->nextIndex - 1};
+  return ConstIterator{back, back->nextIndex};
 }
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
 ChunkedList<T, ChunkSize, ShouldCopy>::ChunkIterator ChunkedList<T, ChunkSize, ShouldCopy>::beginChunk() {
-  return ChunkIterator{back};
+  return ChunkIterator{front};
 }
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
 ChunkedList<T, ChunkSize, ShouldCopy>::ChunkIterator ChunkedList<T, ChunkSize, ShouldCopy>::endChunk() {
-  return ChunkIterator{front + 1};
+  return ChunkIterator{nullptr};
 }
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
 void ChunkedList<T, ChunkSize, ShouldCopy>::push(ValueType value) {
   if (back->nextIndex == ChunkSize) {
     if constexpr (ShouldCopy) {
-      auto *nextChunk = new Chunk{std::move(value)};
+      auto *nextChunk = new Chunk{value};
       nextChunk->prevChunk = back;
       back->nextChunk = nextChunk;
       back = nextChunk;
     } else {
-      auto *nextChunk = new Chunk{value};
+      auto *nextChunk = new Chunk{std::move(value)};
       nextChunk->prevChunk = back;
       back->nextChunk = nextChunk;
       back = nextChunk;
     }
   } else {
     if constexpr (ShouldCopy)
-      (*back)[back->nextIndex] = std::move(value);
-    else
       (*back)[back->nextIndex] = value;
+    else
+      (*back)[back->nextIndex] = std::move(value);
     ++back->nextIndex;
   }
 }
@@ -151,8 +151,10 @@ template<typename T, size_t ChunkSize, bool ShouldCopy>
 template<bool AscendingOrder>
 void ChunkedList<T, ChunkSize, ShouldCopy>::sort() {
   if constexpr (AscendingOrder) {
+    DEBUG_LOG("Calling ascendingSort utility function")
     ChunkedListUtility::ascendingSort(*this);
   } else {
+    DEBUG_LOG("Calling descendingSort utility function");
     ChunkedListUtility::descendingSort(*this);
   }
 }
@@ -160,8 +162,10 @@ void ChunkedList<T, ChunkSize, ShouldCopy>::sort() {
 template<typename T, size_t ChunkSize, bool ShouldCopy>
 void ChunkedList<T, ChunkSize, ShouldCopy>::sort(bool ascendingOrder) {
   if (ascendingOrder) {
+    DEBUG_LOG("Calling ascendingSort utility function")
     ChunkedListUtility::ascendingSort(*this);
   } else {
+    DEBUG_LOG("Calling descendingSort utility function");
     ChunkedListUtility::descendingSort(*this);
   }
 }
@@ -169,6 +173,11 @@ void ChunkedList<T, ChunkSize, ShouldCopy>::sort(bool ascendingOrder) {
 template<typename T, size_t ChunkSize, bool ShouldCopy>
 size_t ChunkedList<T, ChunkSize, ShouldCopy>::size() const {
   return (chunkCount * ChunkSize) + back->nextIndex - 1;
+}
+
+template<typename T, size_t ChunkSize, bool ShouldCopy>
+bool ChunkedList<T, ChunkSize, ShouldCopy>::empty() const {
+  return back->nextIndex == 0;
 }
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
