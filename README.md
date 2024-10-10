@@ -109,8 +109,8 @@ word in the list together with " ", subsequently outputting the returned **std::
 
 ## Naming Conventions
 
-The **ChunkedList** data structure uses `camelCase`. However, if you would like to use the **ChunkedList** with snake
-case, you can add
+The **ChunkedList** data structure uses `camelCase`. However, if you would like to use the **ChunkedList** with
+`snake_case`, you can add
 
 ```cpp
 #include "StandardChunkedList.hpp"
