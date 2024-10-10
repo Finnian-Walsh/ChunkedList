@@ -119,7 +119,7 @@ The **ChunkedList** data structure uses `camelCase`. However, if you would like 
 to your code instead. This gives you access to the **StandardChunkedList** data structure, which has all the same
 methods of the **ChunkedList**, only written in snake case.
 
-### StandardChunkedList Examples
+### Standard Chunked List Examples
 
 ````cpp
 #include "StandardChunkedList.hpp"
