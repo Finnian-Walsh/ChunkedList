@@ -40,6 +40,8 @@ class StandardChunkedList final
     
     using length = DerivedChunkedList::size;
     
+    using DerivedChunkedList::empty;
+    
     using DerivedChunkedList::operator==;
     
     using DerivedChunkedList::operator!=;
@@ -47,6 +49,12 @@ class StandardChunkedList final
     using DerivedChunkedList::operator<<;
     
     using DerivedChunkedList::concat;
+    
+    using Iterator = DerivedChunkedList::Iterator;
+    
+    using ConstIterator = DerivedChunkedList::ConstIterator;
+    
+    using ChunkIterator = DerivedChunkedList::ConstIterator;
 };
 
 #include "../src/StandardChunkedList.tpp"
