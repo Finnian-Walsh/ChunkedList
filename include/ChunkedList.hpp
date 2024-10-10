@@ -132,11 +132,11 @@ class ChunkedList {
           return ChunkIterator{ptr};
         }
         
-        ChunkIterator operator+=(size_t offset) {
+        ChunkIterator operator+=(const size_t offset) {
           return *this = operator+(offset);
         }
         
-        ChunkIterator operator-=(size_t offset) {
+        ChunkIterator operator-=(const size_t offset) {
           return *this = operator-(offset);
         }
         
@@ -156,27 +156,27 @@ class ChunkedList {
           return chunk;
         }
         
-        bool operator==(ChunkIterator other) const {
+        bool operator==(const ChunkIterator other) const {
           return other.chunk == chunk;
         }
         
-        bool operator!=(ChunkIterator other) const {
+        bool operator!=(const ChunkIterator other) const {
           return other.chunk != chunk;
         }
         
-        T &operator[](size_t index) {
+        T &operator[](const size_t index) {
           return (*chunk)[index];
         }
         
-        const T &operator[](size_t index) const {
+        const T &operator[](const size_t index) const {
           return (*chunk)[index];
         }
         
-        bool operator==(ChunkIterator other) {
+        bool operator==(const ChunkIterator other) {
           return chunk == other.chunk;
         }
         
-        bool operator!=(ChunkIterator other) {
+        bool operator!=(const ChunkIterator other) {
           return chunk == other.chunk;
         }
       
@@ -318,6 +318,8 @@ class ChunkedList {
     void sort(bool ascendingOrder);
     
     [[nodiscard]] size_t size() const;
+    
+    [[nodiscard]] bool empty() const;
     
     bool operator==(const ChunkedList &other) const;
     
