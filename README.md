@@ -105,7 +105,7 @@ int main() {
 ```
 
 Creates a **ChunkedList** populated with **std::string**s containing "hello" and "world" then joins each
-word in the list together with " ", subsequently outputting the returned **std::string***.
+word in the list together with " ", subsequently outputting the returned **std::string**.
 
 ## Naming Conventions
 
