@@ -106,3 +106,41 @@ int main() {
 
 Creates a **ChunkedList** populated with **std::string**s containing "hello" and "world" then joins each
 word in the list together with " ", subsequently outputting the returned **std::string***.
+
+## Naming Conventions
+
+The **ChunkedList** data structure uses `camelCase`. However, if you would like to use the **ChunkedList** with snake
+case, you can add
+
+```cpp
+#include "StandardChunkedList.hpp"
+```
+
+to your code instead. This gives you access to the **StandardChunkedList** data structure, which has all the same
+methods of the **ChunkedList**, only written in snake case.
+
+### StandardChunkedList Examples
+
+````cpp
+#include "StandardChunkedList.hpp"
+
+#include <random>
+
+int main() {
+  StandardChunkedList<int, 32> chunkedList{};
+  
+  std::mt19937 gen{std::random_device{}};
+  std::uniform_int_distrubition<int> dist{1, 100};
+  
+  for (int i = 0; i < 1000; ++i) {
+    int num = dist(gen);
+    chunkedList.push_back(num);
+  }
+  
+  chunkedList.sort<true>();
+  
+  std::cout << chunkedList << std::endl;
+  
+  return 0;
+}
+````
