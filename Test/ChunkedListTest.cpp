@@ -1,4 +1,5 @@
 
+#define CHUNKED_LIST_DEBUGGING
 #include "ChunkedList.hpp"
 
 #include <iostream>
@@ -136,7 +137,7 @@ int main() {
     potentialError = "ChunkIterator inequality";
     for (; chunkIt != endChunk; ++chunkIt, ++chunkIndex) {
       potentialError = "Dereferencing ChunkIterator or Chunk indexing";
-      int item = chunkIt->operator[](chunkedList.chunk_size() - 1);
+      int item = chunkIt->operator[](chunkedList.chunkSize - 1);
       
       potentialError = "String concatenation";
       RETURN_IF(item & 1,
@@ -146,7 +147,7 @@ int main() {
       potentialError = "ChunkIterator operator++(int)";
     }
     
-    potentialError = "";
+    potentialError = "Indexing";
     RETURN_IF(chunkedList[chunkedList.size() - 1] != 10, "Last item is not 10")
     
     return Result{true};
@@ -176,7 +177,7 @@ int main() {
     potentialError = "calling begin()";
     auto iterator = list.begin();
     
-    potentialError = "Iterator operator+=";
+    potentialError = "Iterator operator+=()";
     iterator += 1;
     
     potentialError = "calling end()";
