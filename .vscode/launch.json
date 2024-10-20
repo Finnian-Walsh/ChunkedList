@@ -2,10 +2,10 @@
   "version": "0.2.0",
   "configurations": [
       {
-          "name": "Debug Test Executable",
+          "name": "Test Executable",
           "type": "cppdbg",
           "request": "launch",
-          "program": "${workspaceFolder}/build/Test", // Path to the built executable
+          "program": "${workspaceFolder}/Test/build/vscode",
           "args": [],
           "stopAtEntry": false,
           "cwd": "${workspaceFolder}",
@@ -20,7 +20,6 @@
               }
           ],
           "preLaunchTask": "Pre-launch Tasks"
-          // "miDebuggerPath": "/usr/bin/gdb" // Update this path if necessary
       }
   ]
 }
