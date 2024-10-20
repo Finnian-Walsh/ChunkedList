@@ -221,8 +221,6 @@ std::ostream &operator<<(std::ostream &os, ChunkedList<T, ChunkSize, ShouldCopy>
   return os;
 }
 
-#include <iostream>
-
 template<typename T, size_t ChunkSize, bool ShouldCopy>
 template<typename OutputStream, typename StringType, typename DelimiterType, StringType(*ConversionCall)(
 OutputStream &)>
