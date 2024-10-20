@@ -17,7 +17,7 @@ ChunkedList<T, ChunkSize, ShouldCopy>::ChunkedList() {
 }
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
-[[maybe_unused]] ChunkedList<T, ChunkSize, ShouldCopy>::ChunkedList(const std::initializer_list<T> &initializerList) {
+ChunkedList<T, ChunkSize, ShouldCopy>::ChunkedList(const std::initializer_list<T> &initializerList) {
   if (initializerList.size() == 0) {
     front = back = new Chunk{};
     return;
@@ -28,7 +28,7 @@ template<typename T, size_t ChunkSize, bool ShouldCopy>
   DEBUG_EXECUTE({
                   for (int i = 0; i < initializerList.size(); ++i)
                     DEBUG_LOG(*(initializerList.begin() + i) << ' ');
-                  DEBUG_LINE
+                  DEBUG_LINE(false)
                 })
   
   if (ChunkSize >= initializerList.size()) {
@@ -56,11 +56,6 @@ template<typename T, size_t ChunkSize, bool ShouldCopy>
 template<typename T, size_t ChunkSize, bool ShouldCopy>
 ChunkedList<T, ChunkSize, ShouldCopy>::~ChunkedList() {
   while (back) popChunk();
-}
-
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-constexpr size_t ChunkedList<T, ChunkSize, ShouldCopy>::chunk_size() const {
-  return ChunkSize;
 }
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
@@ -213,7 +208,7 @@ std::ostream &operator<<(std::ostream &os, ChunkedList<T, ChunkSize, ShouldCopy>
   DEBUG_EXECUTE({ os << '\n'; })
   
   for (auto chunkIterator = chunkedList.beginChunk(); chunkIterator != chunkedList.endChunk(); ++chunkIterator) {
-    DEBUG_LOG("Next index: " << chunk->nextIndex << '\n')
+    DEBUG_LOG("Next index: " << chunkIterator->nextIndex << '\n')
     
     for (int i = 0; i < chunkIterator->nextIndex; ++i)
       os << ' ' << (*chunkIterator)[i] << ',';
@@ -226,10 +221,12 @@ std::ostream &operator<<(std::ostream &os, ChunkedList<T, ChunkSize, ShouldCopy>
   return os;
 }
 
+#include <iostream>
+
 template<typename T, size_t ChunkSize, bool ShouldCopy>
-template<typename OutputStream, typename StringType, typename SeparatorType, StringType(*ConversionCall)(
+template<typename OutputStream, typename StringType, typename DelimiterType, StringType(*ConversionCall)(
 OutputStream &)>
-StringType ChunkedList<T, ChunkSize, ShouldCopy>::concat(const SeparatorType separator) {
+StringType ChunkedList<T, ChunkSize, ShouldCopy>::concat(const DelimiterType delimiter) {
   static_assert(ChunkedListUtility::has_insertion_operator_v<OutputStream, StringType>,
                 "OutputStream cannot handle StringType");
   static_assert(ChunkedListUtility::has_insertion_operator_v<OutputStream, StringType>,
@@ -239,11 +236,16 @@ StringType ChunkedList<T, ChunkSize, ShouldCopy>::concat(const SeparatorType sep
   
   Iterator it = begin(), lastIt = end() - 1;
   
-  if (it == lastIt) return StringType{};
+  if (it == lastIt) {
+    DEBUG_LOG("Empty ChunkedList" << std::endl)
+    return StringType{};
+  };
   
-  std::for_each(it, lastIt, [&stream, separator](ValueType v) mutable {
-    stream << v << separator;
-  });
+  for (; it != lastIt; ++it) {
+    stream << *it << delimiter;
+    
+    DEBUG_LOG(stream.str() << '\n');
+  }
   
   stream << *++lastIt;
   
