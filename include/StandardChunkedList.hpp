@@ -16,8 +16,6 @@ class StandardChunkedList final
   public:
     using DerivedChunkedList::ChunkedList;
     
-    using DerivedChunkedList::chunk_size;
-    
     using DerivedChunkedList::operator[];
     
     using DerivedChunkedList::begin;
