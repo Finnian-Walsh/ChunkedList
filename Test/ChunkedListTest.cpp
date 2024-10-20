@@ -1,120 +1,18 @@
 
-#define CHUNKED_LIST_DEBUGGING
+#include "Core/TestUtility.hpp"
 #include "ChunkedList.hpp"
 
-#include <iostream>
-#include <functional>
 #include <random>
-#include <cstdlib>
-#include <csignal>
-#include <memory>
 
 template<size_t ChunkSize = 32, typename T = int, bool ShouldCopy = false>
 using TestChunkedList = ChunkedList<T, ChunkSize, ShouldCopy>;
-
-#define BEGIN int testNumber{1}; std::cout << "Starting tests..." << std::endl
-#define CALL_TEST(functionName, functionPtr) std::cout << "Test " << testNumber << ":\n"; callFunction(functionName, functionPtr); std::cout << "Test " << testNumber << " successful" << std::endl; ++testNumber;
-#define SUCCESS std::cout << "All " << testNumber - 1 << " tests have been ran."; return EXIT_SUCCESS
-#define RETURN_IF(condition, str) if (condition) return Result{str};
-
-class PotentialError {
-  private:
-    std::string error;
-    bool null{true};
-  public:
-    
-    PotentialError() = default;
-    
-    [[maybe_unused]] explicit PotentialError(const char *str) : error{str}, null{false} {}
-    
-    [[maybe_unused]] explicit PotentialError(std::string &&str) : error{std::move(str)}, null{false} {}
-    
-    [[maybe_unused]] explicit PotentialError(const std::string &str) : error{str}, null{false} {}
-    
-    [[maybe_unused]] void set(const char *str) {
-      error = str;
-    }
-    
-    [[maybe_unused]] void set(const std::string &str) {
-      error = str;
-    }
-    
-    [[nodiscard]] const std::string &get() const {
-      return error;
-    }
-    
-    PotentialError &operator=(const char *str) {
-      error = str;
-      return *this;
-    }
-    
-    PotentialError &operator=(const std::string &str) {
-      error = str;
-      return *this;
-    }
-    
-    void setNull() {
-      null = true;
-    }
-    
-    [[nodiscard]] bool isNull() const {
-      return null;
-    }
-  
-} potentialError;
-
-class Result {
-  public:
-    const std::string message{};
-    const bool status{false};
-    
-    explicit Result(bool status) : status{status} {}
-    
-    explicit Result(std::string &&message) : message{std::move(message)} {}
-    
-    explicit Result(const std::string &message) : message{message} {}
-    
-    explicit Result(const char *message) : message{message} {}
-    
-    bool operator!() const {
-      return status;
-    }
-    
-    operator bool() const {
-      return status;
-    }
-};
-
-void callFunction(const char *functionName, Result(*functionPtr)()) {
-  std::signal(SIGSEGV, [](int signalNumber) -> void {
-    std::cerr << "Potential error: " << potentialError.get() << "\nSegmentation fault: " << signalNumber << std::endl;
-    std::terminate();
-  });
-  
-  std::unique_ptr<Result> result{};
-  
-  try {
-    potentialError.setNull();
-    result = std::make_unique<Result>(functionPtr());
-  } catch (const std::exception &e) {
-    if (potentialError.isNull())
-      std::cerr << "Call to " << functionName << "failed\nUnknown error" << std::endl;
-    else
-      std::cerr << "Call to " << functionName << "failed\nPotential error: " << potentialError.get() << '\n' << e.what()
-                << std::endl;
-    std::terminate();
-  }
-  
-  if (!result->status)
-    throw std::runtime_error(
-    ((std::string{"Function call failed:\n"} += functionName) += '\n') += result->message);
-}
 
 int main() {
   BEGIN;
   
   CALL_TEST("Front and back", ([]() -> Result {
-    using List = TestChunkedList<2>;
+    constexpr size_t chunkSize = 2;
+    using List = TestChunkedList<chunkSize>;
     List chunkedList{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
     
     int chunkIndex{};
@@ -137,7 +35,7 @@ int main() {
     potentialError = "ChunkIterator inequality";
     for (; chunkIt != endChunk; ++chunkIt, ++chunkIndex) {
       potentialError = "Dereferencing ChunkIterator or Chunk indexing";
-      int item = chunkIt->operator[](chunkedList.chunkSize - 1);
+      int item = chunkIt->operator[](chunkSize - 1);
       
       potentialError = "String concatenation";
       RETURN_IF(item & 1,
