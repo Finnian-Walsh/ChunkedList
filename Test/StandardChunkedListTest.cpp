@@ -1,3 +1,10 @@
-//
-// Created by finni on 19/10/2024.
-//
+
+#include "Core/TestUtility.hpp"
+#include "StandardChunkedList.hpp"
+
+template<size_t ChunkSize = 32, typename T = int, bool ShouldCopy = false>
+using TestChunkedList = StandardChunkedList<T, ChunkSize, ShouldCopy>;
+
+int main() {
+  TestChunkedList<> testList{};
+}
