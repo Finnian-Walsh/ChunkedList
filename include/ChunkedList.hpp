@@ -6,11 +6,13 @@
 #include <cstring>
 #include <algorithm>
 #include <functional>
-#include <queue>
-#include <vector>
+#include <queue> // for std::priority_queue
+#include <vector> // for std::vector
 
 #ifdef CHUNKED_LIST_DEBUGGING
-#include <iostream>
+
+#include <iostream> // for character output
+
 #endif
 
 #ifdef IMPLEMENT_CHUNKED_LIST_PRIVATELY
@@ -82,7 +84,7 @@ class ChunkedList {
     
     ChunkedList();
     
-    [[maybe_unused]] ChunkedList(const std::initializer_list<T> &initializerList);
+    ChunkedList(const std::initializer_list<T> &initializerList);
     
     ~ChunkedList();
     
@@ -288,8 +290,6 @@ class ChunkedList {
         size_t index{0};
     };
     
-    [[nodiscard]] constexpr size_t chunk_size() const;
-    
     T &operator[](size_t index);
     
     const T &operator[](size_t index) const;
@@ -334,7 +334,7 @@ class ChunkedList {
     typename SeparatorType = std::string,
     StringType(*ConversionCall)(OutputStream &) = nullptr
     >
-    StringType concat(SeparatorType separator);
+    StringType concat(SeparatorType delimiter = ", ");
 };
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
