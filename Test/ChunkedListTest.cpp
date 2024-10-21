@@ -23,7 +23,7 @@ int main() {
       os << chunkedList;
       
       RETURN_IF(os.str() != "[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]",
-                std::string("ostream insertion ran incorrectly\nGot: ").operator+=(os.str()))
+                std::string("ostream insertion ran incorrectly\nGot: ") += (os.str()))
     }
     
     potentialError = "calling beginChunk()";
