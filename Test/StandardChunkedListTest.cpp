@@ -1,5 +1,5 @@
 
-#include "Core/TestUtility.hpp"
+#include "core/TestUtility.hpp"
 #include "StandardChunkedList.hpp"
 
 template<size_t ChunkSize = 32, typename T = int, bool ShouldCopy = false>
