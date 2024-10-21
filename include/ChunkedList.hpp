@@ -15,13 +15,6 @@
 
 #endif
 
-#ifdef IMPLEMENT_CHUNKED_LIST_PRIVATELY
-
-namespace ChunkedListUtility {
-  namespace ChunkedListImplementation {
-
-#endif
-
 template<typename T, size_t ChunkSize = 32, bool ShouldCopy = true>
 class ChunkedList {
     static_assert(ChunkSize > 0, "Chunk Size must be greater than 0");
@@ -309,9 +302,5 @@ end(const ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList) noexcept;
 #include "../src/ChunkedList.tpp"
 #include "../src/ChunkedListChunk.tpp"
 #include "../src/ChunkedListIterator.tpp"
-
-#ifdef IMPLEMENT_CHUNKED_LIST_PRIVATELY
-}}
-#endif
 
 #endif
