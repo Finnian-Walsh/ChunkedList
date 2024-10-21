@@ -9,9 +9,9 @@
 
 template<typename T, size_t ChunkSize = 32, bool ShouldCopy = true>
 class StandardChunkedList final
-: private ChunkedListUtility::ChunkedListImplementation::ChunkedList<T, ChunkSize, ShouldCopy> {
+: private ChunkedList<T, ChunkSize, ShouldCopy> {
   private:
-    using DerivedChunkedList = ChunkedListUtility::ChunkedListImplementation::ChunkedList<T, ChunkSize, ShouldCopy>;
+    using DerivedChunkedList = ChunkedList<T, ChunkSize, ShouldCopy>;
   
   public:
     using Iterator = DerivedChunkedList::Iterator;
