@@ -53,7 +53,7 @@ class StandardChunkedList final
     using DerivedChunkedList::concat;
     
     template<typename, size_t, bool>
-    friend std::ostream &operator<<(std::ostream &os, ChunkedList &chunkedList);
+    friend std::ostream &operator<<(std::ostream &os, StandardChunkedList &chunkedList);
 };
 
 #include "../src/StandardChunkedList.tpp"
