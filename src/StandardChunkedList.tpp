@@ -1,3 +1,5 @@
+#pragma once
+
 #include "StandardChunkedList.hpp"
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
@@ -44,5 +46,5 @@ end(StandardChunkedList<T, ChunkSize, ShouldCopy> &standardChunkedList) {
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
 std::ostream &operator<<(std::ostream &os, StandardChunkedList<T, ChunkSize, ShouldCopy> &standardChunkedList) {
-  return operator<<(os, static_cast<ChunkedListUtility::ChunkedListImplementation::ChunkedList<T, ChunkSize, ShouldCopy>>(standardChunkedList));
+  return operator<<(os, static_cast<ChunkedList<T, ChunkSize, ShouldCopy>>(standardChunkedList));
 }
