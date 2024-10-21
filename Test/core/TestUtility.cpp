@@ -15,8 +15,12 @@ void PotentialError::set(const std::string &str) {
   error = str;
 }
 
-const std::string &PotentialError::get() const {
+const std::string &PotentialError::str() const {
   return error;
+}
+
+const char *PotentialError::c_str() const {
+  return error.c_str();
 }
 
 PotentialError &PotentialError::operator=(const char *str) {
@@ -36,6 +40,9 @@ PotentialError &PotentialError::operator=(const std::string &str) {
 
 void PotentialError::setNull(bool b) {
   null = b;
+  if (b) {
+    error = "NULL";
+  }
 }
 
 bool PotentialError::isNull() const {
@@ -125,37 +132,44 @@ void writeNumber(int num) {
   }
 }
 
+auto writePotentialError(int fh, const PotentialError &pe) -> decltype(write(fh, pe.c_str(), size_t{})) {
+  const std::string &str = pe.str();
+  return write(fh, str.c_str(), str.length() + 1); // account for null terminator
+}
+
 void callFunction(const char *functionName, Result(*functionPtr)()) {
   std::signal(SIGSEGV, [](int signalNumber) -> void {
     
     constexpr char potentialErrorLabel[] = "Potential error: ";
     write(STDERR_FILENO, potentialErrorLabel, constexprStrlen(potentialErrorLabel));
-    const char *potentialErrorMessage = potentialError.get().c_str();
-    write(STDERR_FILENO, potentialErrorMessage, constexprStrlen(potentialErrorMessage));
+    writePotentialError(STDERR_FILENO, potentialError);
     write(STDERR_FILENO, "\n", 1);
     
-    constexpr char segfaultLabel[] = "Segmentation fault ";
-    write(STDERR_FILENO, segfaultLabel, constexprStrlen(segfaultLabel));
-    writeNumber<true>(signalNumber);
+    constexpr char signalLabel[] = "Signal ";
+    write(STDERR_FILENO, signalLabel, constexprStrlen(signalLabel));
+    writeNumber(signalNumber);
+    constexpr char segmentationFaultLabel[] = ": Segmentation fault\n";
+    write(STDERR_FILENO, segmentationFaultLabel, constexprStrlen(segmentationFaultLabel));
     
-    _exit(-1);
+    exit(-1);
   });
-  
-  std::unique_ptr<Result> result{};
   
   try {
     potentialError.setNull(true);
-    result = std::make_unique<Result>(functionPtr());
+    Result result = functionPtr();
+    if (!result) {
+      throw std::runtime_error(
+      ((std::string{"Function call failed:\n"} += functionName) += '\n') += result.message);
+    }
+  } catch (const std::runtime_error &) {
+    throw;
   } catch (const std::exception &e) {
     if (potentialError.isNull())
       std::cerr << "Call to " << functionName << "failed\nUnknown error" << std::endl;
     else
-      std::cerr << "Call to " << functionName << "failed\nPotential error: " << potentialError.get() << '\n' << e.what()
+      std::cerr << "Call to " << functionName << "failed\nPotential error: " << potentialError.str() << '\n' << e.what()
                 << std::endl;
-    std::terminate();
+    exit(-1);
   }
   
-  if (!result->status)
-    throw std::runtime_error(
-    ((std::string{"Function call failed:\n"} += functionName) += '\n') += result->message);
 }
