@@ -32,33 +32,22 @@ class ChunkedList {
         T data[ChunkSize]{};
       
       public:
-        Chunk(Chunk *nextChunk, Chunk *prevChunk) : nextChunk(nextChunk), prevChunk(prevChunk) {}
+        Chunk(Chunk *nextChunk, Chunk *prevChunk);
         
-        Chunk(const T *array, int size, Chunk *nextChunk = nullptr, Chunk *prevChunk = nullptr);
+        Chunk(const T *array, size_t size, Chunk *nextChunk = nullptr, Chunk *prevChunk = nullptr);
         
+        /**
+         * @functionality does not check for overflows
+         **/
         Chunk(const std::initializer_list<T> &initializerList);
         
         Chunk() = default;
         
         ~Chunk() = default;
         
-        Chunk &operator+(size_t offset) {
-          Chunk *chunk{this};
-          
-          for (size_t i{0}; i < offset; ++i)
-            chunk = chunk->nextChunk;
-          
-          return *chunk;
-        }
+        Chunk &operator+(size_t offset);
         
-        Chunk &operator-(size_t offset) {
-          Chunk *chunk{this};
-          
-          for (size_t i{0}; i < offset; ++i)
-            chunk = chunk->nextChunk;
-          
-          return *chunk;
-        }
+        Chunk &operator-(size_t offset);
         
         size_t nextIndex{0};
         
@@ -88,102 +77,82 @@ class ChunkedList {
     
     ~ChunkedList();
     
+    class ConstChunkIterator;
+    
     class ChunkIterator {
       public:
-        explicit ChunkIterator(Chunk *chunk) : chunk(chunk) {}
+        explicit ChunkIterator(Chunk *chunk);
         
         ~ChunkIterator() = default;
         
-        ChunkIterator operator++() {
-          chunk = chunk->nextChunk;
-          return *this;
-        }
+        ChunkIterator operator++();
         
-        ChunkIterator operator++(int) {
-          Iterator original = *this;
-          chunk = chunk->nextChunk;
-          return original;
-        }
+        ChunkIterator operator++(int);
         
-        ChunkIterator operator--() {
-          chunk = chunk->prevChunk;
-          return *this;
-        }
+        ChunkIterator operator--();
         
-        ChunkIterator operator--(int) {
-          Iterator original = *this;
-          chunk = chunk->prevChunk;
-          return original;
-        }
+        ChunkIterator operator--(int);
         
-        ChunkIterator operator+(size_t offset) {
-          Chunk *ptr{chunk};
-          
-          for (; offset > 0; --offset)
-            ptr = ptr->nextChunk;
-          
-          return ChunkIterator{ptr};
-        }
+        ChunkIterator operator+(size_t offset) const;
         
-        ChunkIterator operator-(size_t offset) {
-          Chunk *ptr{chunk};
-          
-          for (; offset > 0; --offset)
-            ptr = ptr->prevChunk;
-          
-          return ChunkIterator{ptr};
-        }
+        ChunkIterator operator-(size_t offset) const;
         
-        ChunkIterator operator+=(const size_t offset) {
-          return *this = operator+(offset);
-        }
+        ChunkIterator operator+=(size_t offset);
         
-        ChunkIterator operator-=(const size_t offset) {
-          return *this = operator-(offset);
-        }
+        ChunkIterator operator-=(size_t offset);
         
-        Chunk &operator*() {
-          return *chunk;
-        }
+        Chunk &operator*();
         
-        const Chunk &operator*() const {
-          return *chunk;
-        }
+        Chunk *operator->();
         
-        Chunk *operator->() {
-          return chunk;
-        }
+        virtual const Chunk &operator*() const;
         
-        const Chunk *operator->() const {
-          return chunk;
-        }
+        virtual const Chunk *operator->() const;
         
-        bool operator==(const ChunkIterator other) const {
-          return other.chunk == chunk;
-        }
+        bool operator==(ChunkIterator other) const;
         
-        bool operator!=(const ChunkIterator other) const {
-          return other.chunk != chunk;
-        }
+        bool operator==(ConstChunkIterator other) const;
         
-        T &operator[](const size_t index) {
-          return (*chunk)[index];
-        }
+        bool operator!=(ChunkIterator other) const;
         
-        const T &operator[](const size_t index) const {
-          return (*chunk)[index];
-        }
+        bool operator!=(ConstChunkIterator other) const;
         
-        bool operator==(const ChunkIterator other) {
-          return chunk == other.chunk;
-        }
+        T &operator[](size_t index);
         
-        bool operator!=(const ChunkIterator other) {
-          return chunk == other.chunk;
-        }
+        virtual const T &operator[](size_t index) const;
       
-      private:
+      protected:
         Chunk *chunk;
+    };
+    
+    class ConstChunkIterator final : private ChunkIterator {
+      public:
+        explicit ConstChunkIterator(Chunk *chunk);
+        
+        ~ConstChunkIterator() = default;
+        
+        using ChunkIterator::operator++;
+        
+        using ChunkIterator::operator--;
+        
+        using ChunkIterator::operator+;
+        
+        using ChunkIterator::operator-;
+        
+        using ChunkIterator::operator+=;
+        
+        using ChunkIterator::operator-=;
+        
+        const Chunk &operator*() const override;
+        
+        const Chunk *operator->() const override;
+        
+        using ChunkIterator::operator==;
+        
+        using ChunkIterator::operator!=;
+        
+        const T &operator[](size_t index) const override;
+        
     };
     
     class ConstIterator;
@@ -224,9 +193,9 @@ class ChunkedList {
         
         T *operator->();
         
-        const T &operator*() const;
+        virtual const T &operator*() const;
         
-        const T *operator->() const;
+        virtual const T *operator->() const;
         
         bool operator==(Iterator other) const;
         
@@ -236,20 +205,20 @@ class ChunkedList {
         
         bool operator!=(ConstIterator other) const;
       
-      private:
-        ChunkIterator chunkIterator;
+      protected:
+        ChunkIterator chunkIterator{};
         size_t index{0};
     };
     
-    class ConstIterator {
+    class ConstIterator : private Iterator {
       public:
-        explicit ConstIterator(Chunk *chunk);
+        explicit ConstIterator(const Chunk *chunk);
         
-        ConstIterator(Chunk *chunk, size_t index);
+        ConstIterator(const Chunk *chunk, size_t index);
         
-        explicit ConstIterator(Chunk &chunk);
+        explicit ConstIterator(const Chunk &chunk);
         
-        ConstIterator(Chunk &chunk, size_t index);
+        ConstIterator(const Chunk &chunk, size_t index);
         
         explicit ConstIterator(ChunkIterator chunkIterator);
         
@@ -257,37 +226,25 @@ class ChunkedList {
         
         ~ConstIterator() = default;
         
-        ConstIterator operator++();
+        using Iterator::operator++;
         
-        ConstIterator operator++(int);
-        
-        ConstIterator operator--();
-        
-        ConstIterator operator--(int);
+        using Iterator::operator--;
         
         ConstIterator operator+(size_t offset) const;
         
         ConstIterator operator-(size_t offset) const;
         
-        ConstIterator operator+=(size_t offset);
+        using Iterator::operator+=;
         
-        ConstIterator operator-=(size_t offset);
+        using Iterator::operator-=;
         
-        const T &operator*() const;
+        const T &operator*() const override;
         
-        const T *operator->() const;
+        const T *operator->() const override;
         
-        bool operator==(ConstIterator other) const;
+        using Iterator::operator==;
         
-        bool operator==(Iterator other) const;
-        
-        bool operator!=(ConstIterator other) const;
-        
-        bool operator!=(Iterator other) const;
-      
-      private:
-        ChunkIterator chunkIterator;
-        size_t index{0};
+        using Iterator::operator!=;
     };
     
     T &operator[](size_t index);
