@@ -3,15 +3,22 @@
 #include <cstdlib>
 #include <csignal>
 #include <cstring>
-#include <memory>
 #include <climits>
+#include <random>
 
-#define BEGIN int testNumber{1}; std::cout << "Starting tests..." << std::endl
-#define CALL_TEST(functionName, functionPtr) std::cout << "Test " << testNumber << ":\n"; callFunction(functionName, functionPtr); std::cout << "Test " << testNumber << " successful" << std::endl; ++testNumber;
-#define SUCCESS std::cout << "All " << testNumber - 1 << " tests have been ran."; return EXIT_SUCCESS
+#define BEGIN int testNumber{1}; std::cout << "Starting tests..." << std::endl;
+#define CALL_TEST(functionName, functionPtr) std::cout << "Test " << testNumber << ": " << functionName << '\n'; callFunction(functionName, functionPtr); std::cout << "Test " << testNumber << " successful" << std::endl; ++testNumber;
+#define SUCCESS std::cout << "All " << testNumber - 1 << " tests have been ran."; return EXIT_SUCCESS;
 #define RETURN_IF(condition, str) if (condition) return Result{str};
 
-#define CHUNKED_LIST_DEBUGGING
+class RandomNumberGenerator {
+  private:
+    std::mt19937 engine;
+  public:
+    RandomNumberGenerator();
+    
+    int operator()(int min, int max);
+};
 
 class PotentialError {
   private:
