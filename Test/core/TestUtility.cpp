@@ -1,6 +1,12 @@
 
 #include "TestUtility.hpp"
 
+RandomNumberGenerator::RandomNumberGenerator() : engine{std::random_device{}()} {}
+
+int RandomNumberGenerator::operator()(int min, int max) {
+  return std::uniform_int_distribution{min, max}(engine);
+}
+
 PotentialError::PotentialError(const char *str) : error{str}, null{false} {}
 
 PotentialError::PotentialError(std::string &&str) : error{std::move(str)}, null{false} {}
@@ -58,7 +64,7 @@ Result::Result(const std::string &message) : message{message} {}
 Result::Result(const char *message) : message{message} {}
 
 bool Result::operator!() const {
-  return status;
+  return !status;
 }
 
 Result::operator bool() const {
@@ -161,8 +167,8 @@ void callFunction(const char *functionName, Result(*functionPtr)()) {
       throw std::runtime_error(
       ((std::string{"Function call failed:\n"} += functionName) += '\n') += result.message);
     }
-  } catch (const std::runtime_error &) {
-    throw;
+  } catch (const std::runtime_error &e) {
+    throw e;
   } catch (const std::exception &e) {
     if (potentialError.isNull())
       std::cerr << "Call to " << functionName << "failed\nUnknown error" << std::endl;
