@@ -19,8 +19,9 @@ the array in a different way. However,
 
 Furthermore, each **Chunk** keeps track of its next index, incrementing and decrementing it by 1 each push and pop
 respectively.
-Therefore, calling the pop method on a **ChunkedList** doesn't deallocate anything unless the next index of the front
-**Chunk** is equal to 0, causing the entire Chunk and its contents to be deallocated.
+Therefore, calling the pop method on a **ChunkedList** doesn't deallocate anything unless the next index of the back
+**Chunk** is equal to 0, causing the entire Chunk and its contents to be deallocated. Although, you should make sure to
+be careful with this - using values which have been popped is recommended against.
 
 ## Iterating
 
