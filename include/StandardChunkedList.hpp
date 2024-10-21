@@ -14,29 +14,35 @@ class StandardChunkedList final
     using DerivedChunkedList = ChunkedListUtility::ChunkedListImplementation::ChunkedList<T, ChunkSize, ShouldCopy>;
   
   public:
+    using Iterator = DerivedChunkedList::Iterator;
+    
+    using ConstIterator = DerivedChunkedList::ConstIterator;
+    
+    using ChunkIterator = DerivedChunkedList::ConstIterator;
+    
     using DerivedChunkedList::ChunkedList;
     
     using DerivedChunkedList::operator[];
     
     using DerivedChunkedList::begin;
     
-    using begin_chunk = DerivedChunkedList::beginChunk;
+    ChunkIterator begin_chunk();
     
     using DerivedChunkedList::end;
     
-    using end_chunk = DerivedChunkedList::endChunk;
+    ChunkIterator end_chunk();
     
-    using push_back = DerivedChunkedList::push;
+    void push_back(DerivedChunkedList::ValueType value);
     
-    using pop_back = DerivedChunkedList::pop;
+    void pop_back();
     
-    using pop_back_chunk = DerivedChunkedList::popChunk;
+    void pop_back_chunk();
     
     using DerivedChunkedList::sort;
     
     using DerivedChunkedList::size;
     
-    using length = DerivedChunkedList::size;
+    [[nodiscard]] size_t length() const;
     
     using DerivedChunkedList::empty;
     
@@ -44,15 +50,10 @@ class StandardChunkedList final
     
     using DerivedChunkedList::operator!=;
     
-    using DerivedChunkedList::operator<<;
-    
     using DerivedChunkedList::concat;
     
-    using Iterator = DerivedChunkedList::Iterator;
-    
-    using ConstIterator = DerivedChunkedList::ConstIterator;
-    
-    using ChunkIterator = DerivedChunkedList::ConstIterator;
+    template<typename, size_t, bool>
+    friend std::ostream &operator<<(std::ostream &os, ChunkedList &chunkedList);
 };
 
 #include "../src/StandardChunkedList.tpp"
