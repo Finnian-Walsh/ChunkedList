@@ -1,14 +1,15 @@
 
-#include "core/TestUtility.hpp"
+#define CHUNKED_LIST_DEBUGGING
+
 #include "ChunkedList.hpp"
 
-#include <random>
+#include "core/TestUtility.hpp"
 
 template<size_t ChunkSize = 32, typename T = int, bool ShouldCopy = false>
 using TestChunkedList = ChunkedList<T, ChunkSize, ShouldCopy>;
 
 int main() {
-  BEGIN;
+  BEGIN
   
   CALL_TEST("Front and back", ([]() -> Result {
     constexpr size_t chunkSize = 2;
@@ -16,15 +17,6 @@ int main() {
     List chunkedList{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
     
     int chunkIndex{};
-    
-    {
-      potentialError = "Inserting ChunkedList into ostream";
-      std::ostringstream os{};
-      os << chunkedList;
-      
-      RETURN_IF(os.str() != "[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]",
-                std::string("ostream insertion ran incorrectly\nGot: ") += (os.str()))
-    }
     
     potentialError = "calling beginChunk()";
     auto chunkIt = chunkedList.beginChunk();
@@ -51,19 +43,43 @@ int main() {
     return Result{true};
   }))
   
+  CALL_TEST("Insertion", ([]() -> Result {
+    TestChunkedList chunkedList{5, 10, 15};
+    std::string expectedOutput{"[5, 10, 15"};
+    
+    RandomNumberGenerator rng;
+    
+    for (int i = 0; i < 1000; ++i) {
+      int num = rng(-1000, 1000);
+      expectedOutput += ", ";
+      expectedOutput += std::to_string(num);
+      chunkedList.push(num);
+    }
+    
+    expectedOutput.push_back(']');
+    
+    potentialError = "Inserting ChunkedList into ostream";
+    std::ostringstream os{};
+    os << chunkedList;
+    
+    RETURN_IF(os.str() != expectedOutput,
+              std::string("ostream insertion ran incorrectly\nGot: ") += (os.str()))
+    
+    return Result{true};
+  }))
+  
   CALL_TEST("Sorting", ([]() -> Result {
     int num{};
     
     potentialError = "List creation";
     TestChunkedList list{};
     
-    potentialError = "stl";
-    std::mt19937 gen{std::random_device{}()};
-    std::uniform_int_distribution<> distribution{1, 100};
+    potentialError = "Random Number Generator creation";
+    RandomNumberGenerator rng;
     
-    potentialError = "Pushing";
+    potentialError = "Pushing or using the RNG";
     for (int i{}; i < 100; ++i) {
-      list.push(distribution(gen));
+      list.push(rng(1, 100));
     }
     
     potentialError = "Sorting";
@@ -201,5 +217,5 @@ int main() {
   //   return true;
   // }, bool{true});
   
-  SUCCESS;
+  SUCCESS
 }
