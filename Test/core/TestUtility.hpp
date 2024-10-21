@@ -31,7 +31,9 @@ class PotentialError {
     
     void set(const std::string &str);
     
-    [[nodiscard]] const std::string &get() const;
+    [[nodiscard]] const std::string &str() const;
+    
+    [[nodiscard]] const char *c_str() const;
     
     PotentialError &operator=(const char *str);
     
