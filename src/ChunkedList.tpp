@@ -23,34 +23,36 @@ ChunkedList<T, ChunkSize, ShouldCopy>::ChunkedList(const std::initializer_list<T
     return;
   }
   
-  DEBUG_LOG("Initializer list size: " << initializerList.size() << std::endl)
+  DEBUG_LOG("Initializer list size = " << initializerList.size())
   
   DEBUG_EXECUTE({
-                  for (int i = 0; i < initializerList.size(); ++i)
-                    DEBUG_LOG(*(initializerList.begin() + i) << ' ');
-                  DEBUG_LINE(false)
+                  int index = 0;
+                  DEBUG_LOG(" (")
+                  
+                  for (; index < initializerList.size() - 1; ++index) {
+                    DEBUG_LOG(initializerList.begin()[index] << ", ")
+                  }
+                  
+                  DEBUG_LOG(initializerList.begin()[index] << ")")
+                  DEBUG_LINE(true)
                 })
   
   if (ChunkSize >= initializerList.size()) {
-    front = back = new Chunk{initializerList.begin(), static_cast<int>(initializerList.size())};
+    front = back = new Chunk{initializerList.begin(), initializerList.size()};
     return;
   }
   
-  const int initializerListSizeModChunkSize = initializerList.size() % ChunkSize;
-  chunkCount =
-  initializerListSizeModChunkSize == 0
-  ? initializerList.size() / ChunkSize
-  : initializerList.size() / ChunkSize + 1;
-  front = back = new Chunk{initializerList.begin(), static_cast<int>(ChunkSize)};
+  front = back = new Chunk{initializerList.begin(), ChunkSize};
   
-  for (int index = 1; index < chunkCount - 1; ++index) {
-    pushChunk(new Chunk{initializerList.begin() + index * ChunkSize, static_cast<int>(ChunkSize)});
+  chunkCount = (initializerList.size() + ChunkSize - 1) / ChunkSize;
+  
+  for (int offset = 1; offset < chunkCount - 1; ++offset) {
+    pushChunk(new Chunk{initializerList.begin() + (offset * ChunkSize), ChunkSize});
   }
   
-  pushChunk(new Chunk{
-  initializerList.begin() + (chunkCount - 1) * ChunkSize,
-  ChunkSize > initializerListSizeModChunkSize ? initializerListSizeModChunkSize : static_cast<int>(ChunkSize)
-  });
+  const int remainingItems = initializerList.size() % ChunkSize;
+  pushChunk(
+  new Chunk{initializerList.begin() + (chunkCount - 1) * ChunkSize, remainingItems == 0 ? ChunkSize : remainingItems});
 }
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
@@ -203,20 +205,17 @@ bool ChunkedList<T, ChunkSize, ShouldCopy>::operator!=(const ChunkedList &other)
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
 std::ostream &operator<<(std::ostream &os, ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList) {
-  DEBUG_EXECUTE(os << "Chunked List: ";)
   os << '[';
-  DEBUG_EXECUTE({ os << '\n'; })
   
-  for (auto chunkIterator = chunkedList.beginChunk(); chunkIterator != chunkedList.endChunk(); ++chunkIterator) {
-    DEBUG_LOG("Next index: " << chunkIterator->nextIndex << '\n')
-    
-    for (int i = 0; i < chunkIterator->nextIndex; ++i)
-      os << ' ' << (*chunkIterator)[i] << ',';
-    
-    DEBUG_EXECUTE({ os << '\n'; })
+  auto iterator = chunkedList.begin(), lastIterator = chunkedList.end() - 1;
+  
+  for (; iterator != lastIterator; ++iterator) {
+    os << *iterator << ", ";
   }
   
-  os << " ]";
+  os << *lastIterator;
+  
+  os << "]";
   
   return os;
 }
@@ -237,7 +236,7 @@ StringType ChunkedList<T, ChunkSize, ShouldCopy>::concat(const DelimiterType del
   if (it == lastIt) {
     DEBUG_LOG("Empty ChunkedList" << std::endl)
     return StringType{};
-  };
+  }
   
   for (; it != lastIt; ++it) {
     stream << *it << delimiter;
