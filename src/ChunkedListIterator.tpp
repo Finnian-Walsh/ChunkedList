@@ -172,7 +172,7 @@ bool ChunkedList<T, ChunkSize, ShouldCopy>::Iterator::operator!=(const Iterator 
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
 bool ChunkedList<T, ChunkSize, ShouldCopy>::Iterator::operator!=(const ConstIterator other) const {
-  return other.chunkIterator != chunkIterator || other.index != index;
+  return reinterpret_cast<const Iterator *>(&other)->chunkIterator != chunkIterator || reinterpret_cast<const Iterator *>(&other)->index != index;
 }
 
 /*
@@ -192,15 +192,15 @@ ChunkedList<T, ChunkSize, ShouldCopy>::ConstIterator::ConstIterator(const Chunk 
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
 ChunkedList<T, ChunkSize, ShouldCopy>::ConstIterator::ConstIterator(const Chunk *chunk, const size_t index)
-: Iterator{chunk, index} {}
+: Iterator{const_cast<Chunk *>(chunk), index} {}
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
 ChunkedList<T, ChunkSize, ShouldCopy>::ConstIterator::ConstIterator(const Chunk &chunk)
-: Iterator{chunk} {}
+: Iterator{const_cast<Chunk &>(chunk)} {}
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
 ChunkedList<T, ChunkSize, ShouldCopy>::ConstIterator::ConstIterator(const Chunk &chunk, const size_t index)
-: Iterator{chunk, index} {}
+: Iterator{const_cast<Chunk &>(chunk), index} {}
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
 ChunkedList<T, ChunkSize, ShouldCopy>::ConstIterator::ConstIterator(const ChunkIterator chunkIterator)
