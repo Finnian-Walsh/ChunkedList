@@ -44,7 +44,7 @@ int main() {
   }))
   
   CALL_TEST("Insertion", ([]() -> Result {
-    TestChunkedList chunkedList{5, 10, 15};
+    TestChunkedList<> chunkedList{5, 10, 15};
     std::string expectedOutput{"[5, 10, 15"};
     
     RandomNumberGenerator rng;
@@ -72,7 +72,7 @@ int main() {
     int num{};
     
     potentialError = "List creation";
-    TestChunkedList list{};
+    TestChunkedList<> list{};
     
     potentialError = "Random Number Generator creation";
     RandomNumberGenerator rng;
@@ -114,7 +114,7 @@ int main() {
   
   CALL_TEST("Iterators", ([]() -> Result {
     potentialError = "List creation";
-    TestChunkedList chunkedList{1, 2, 3, 4, 5};
+    TestChunkedList<> chunkedList{1, 2, 3, 4, 5};
     int total{};
     
     potentialError = "List iteration (implicit)";
@@ -146,8 +146,8 @@ int main() {
   }))
   
   CALL_TEST("Equality and inequality", ([]() -> Result {
-    TestChunkedList list1{};
-    TestChunkedList list2;
+    TestChunkedList<> list1{};
+    TestChunkedList<> list2;
     
     potentialError = "Pushing";
     
