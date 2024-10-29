@@ -57,17 +57,11 @@ outputted in the console.
 
 ## How to use
 
-### For Git
-
-Add the repository as a submodule.
+Using this repository is simple. Either add the repository as a submodule or clone the repository.
 
 ```bash
 git submodule add https://github.com/Finnian-Walsh/ChunkedList.git <path>
 ```
-
-### For non-Git projects
-
-Ensure that your current path is set to your project's directory.
 
 ```bash
 git clone https://github.com/Finnian-Walsh/ChunkedList.git
