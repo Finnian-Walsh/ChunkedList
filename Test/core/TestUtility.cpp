@@ -29,6 +29,14 @@ const char *PotentialError::c_str() const {
   return error.c_str();
 }
 
+const char *PotentialError::getTestPtr() const {
+  return test.c_str();
+}
+
+const std::string &PotentialError::getTestStr() const {
+  return test;
+}
+
 PotentialError &PotentialError::operator=(const char *str) {
   error = str;
   return *this;
@@ -44,11 +52,10 @@ PotentialError &PotentialError::operator=(const std::string &str) {
   return *this;
 };
 
-void PotentialError::setNull(bool b) {
-  null = b;
-  if (b) {
-    error = "NULL";
-  }
+void PotentialError::newTest(const std::string &name) {
+  test = name;
+  null = true;
+  error.clear();
 }
 
 bool PotentialError::isNull() const {
@@ -85,7 +92,8 @@ template<bool newline = false>
 void writeNumber(int num) {
   if (num > 0) {
     if (num == INT_MAX) {
-      write(STDERR_FILENO, "2147483647", 10);
+      constexpr char str[] = "2147483647";
+      write(STDERR_FILENO, str, constexprStrlen(str));
       return;
     }
     
@@ -110,7 +118,8 @@ void writeNumber(int num) {
     return;
   } else {
     if (num == INT_MIN) {
-      write(STDERR_FILENO, "2147483647", 10);
+      constexpr char str[] = "-2147483647";
+      write(STDERR_FILENO, str, constexprStrlen(str));
       return;
     }
     
@@ -138,7 +147,12 @@ void writeNumber(int num) {
   }
 }
 
-auto writePotentialError(int fh, const PotentialError &pe) -> decltype(write(fh, pe.c_str(), size_t{})) {
+auto writePotentialError(int fh, const PotentialError &pe) {
+  if (pe.isNull()) {
+    const char *str = "null";
+    return write(fh, str, constexprStrlen(str));
+  }
+  
   const std::string &str = pe.str();
   return write(fh, str.c_str(), str.length() + 1); // account for null terminator
 }
@@ -146,22 +160,23 @@ auto writePotentialError(int fh, const PotentialError &pe) -> decltype(write(fh,
 void callFunction(const char *functionName, Result(*functionPtr)()) {
   std::signal(SIGSEGV, [](int signalNumber) -> void {
     
+    constexpr char testFailureLabel[] = " test failed\n";
+    const char *testName = potentialError.getTestPtr();
+    write(STDERR_FILENO, testName, std::strlen(testName));
+    write(STDERR_FILENO, testFailureLabel, constexprStrlen(testFailureLabel));
+    
     constexpr char potentialErrorLabel[] = "Potential error: ";
     write(STDERR_FILENO, potentialErrorLabel, constexprStrlen(potentialErrorLabel));
     writePotentialError(STDERR_FILENO, potentialError);
     write(STDERR_FILENO, "\n", 1);
     
-    constexpr char signalLabel[] = "Signal ";
+    constexpr char signalLabel[] = "Signal 11: Segmentation Fault";
     write(STDERR_FILENO, signalLabel, constexprStrlen(signalLabel));
-    writeNumber(signalNumber);
-    constexpr char segmentationFaultLabel[] = ": Segmentation fault\n";
-    write(STDERR_FILENO, segmentationFaultLabel, constexprStrlen(segmentationFaultLabel));
-    
     exit(-1);
   });
   
   try {
-    potentialError.setNull(true);
+    potentialError.newTest(functionName);
     Result result = functionPtr();
     if (!result) {
       throw std::runtime_error(

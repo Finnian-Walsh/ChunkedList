@@ -22,6 +22,7 @@ class RandomNumberGenerator {
 
 class PotentialError {
   private:
+    std::string test{};
     std::string error{};
     bool null{true};
   public:
@@ -42,16 +43,19 @@ class PotentialError {
     
     [[nodiscard]] const char *c_str() const;
     
+    [[nodiscard]] const char *getTestPtr() const;
+    
+    [[nodiscard]] const std::string &getTestStr() const;
+    
     PotentialError &operator=(const char *str);
     
     PotentialError &operator=(std::string &&str);
     
     PotentialError &operator=(const std::string &str);
     
-    void setNull(bool b);
+    void newTest(const std::string &str);
     
     [[nodiscard]] bool isNull() const;
-  
 };
 
 static PotentialError potentialError;
