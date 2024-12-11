@@ -1,9 +1,16 @@
 
 #include "TestUtility.hpp"
 
+#include <cstdlib>
+#include <csignal>
+#include <cstring>
+#include <climits>
+
+using namespace TestUtility;
+
 RandomNumberGenerator::RandomNumberGenerator() : engine{std::random_device{}()} {}
 
-int RandomNumberGenerator::operator()(int min, int max) {
+int RandomNumberGenerator::operator()(const int min, const int max) {
   return std::uniform_int_distribution{min, max}(engine);
 }
 
@@ -52,8 +59,8 @@ PotentialError &PotentialError::operator=(const std::string &str) {
   return *this;
 };
 
-void PotentialError::newTest(const std::string &name) {
-  test = name;
+void PotentialError::newTest(const std::string &str) {
+  test = str;
   null = true;
   error.clear();
 }
@@ -62,7 +69,7 @@ bool PotentialError::isNull() const {
   return null;
 }
 
-Result::Result(bool status) : status{status} {}
+Result::Result(const bool status) : status{status} {}
 
 Result::Result(std::string &&message) : message{std::move(message)} {}
 
@@ -88,8 +95,12 @@ constexpr size_t constexprStrlen(const char *str) {
   return length;
 }
 
+void writeCharacter(const int fileHandle, const char c) {
+  write(fileHandle, &c, 1);
+}
+
 template<bool newline = false>
-void writeNumber(int num) {
+void writeNumber(const int fileHandle, int num) {
   if (num > 0) {
     if (num == INT_MAX) {
       constexpr char str[] = "2147483647";
@@ -112,14 +123,14 @@ void writeNumber(int num) {
       num /= 10;
     }
     
-    write(STDERR_FILENO, buffer, bufferSize + 1);
+    write(fileHandle, buffer, bufferSize + 1);
   } else if (num == 0) {
-    write(STDERR_FILENO, "0", 1);
+    write(fileHandle, "0", 1);
     return;
   } else {
     if (num == INT_MIN) {
       constexpr char str[] = "-2147483647";
-      write(STDERR_FILENO, str, constexprStrlen(str));
+      write(fileHandle, str, constexprStrlen(str));
       return;
     }
     
@@ -139,15 +150,15 @@ void writeNumber(int num) {
       num /= 10;
     }
     
-    write(STDERR_FILENO, buffer, bufferSize + 1);
+    write(fileHandle, buffer, bufferSize + 1);
   }
   
   if constexpr (newline) {
-    write(STDERR_FILENO, "\n", 1);
+    write(fileHandle, "\n", 1);
   }
 }
 
-auto writePotentialError(int fh, const PotentialError &pe) {
+auto writePotentialError(const int fh, const PotentialError &pe) {
   if (pe.isNull()) {
     const char *str = "null";
     return write(fh, str, constexprStrlen(str));
@@ -158,32 +169,35 @@ auto writePotentialError(int fh, const PotentialError &pe) {
 }
 
 void callFunction(const char *functionName, Result(*functionPtr)()) {
-  std::signal(SIGSEGV, [](int signalNumber) -> void {
+  std::signal(SIGSEGV, [](int) -> void {
     
-    constexpr char testFailureLabel[] = " test failed\n";
+    constexpr char testLabel[] = "Test ";
+    constexpr char failureLabel[] = "failed: ";
     const char *testName = potentialError.getTestPtr();
+    write(STDERR_FILENO, testLabel, constexprStrlen(testLabel));
+    writeNumber(STDERR_FILENO, testNumber);
+    write(STDERR_FILENO, failureLabel, constexprStrlen(failureLabel));
     write(STDERR_FILENO, testName, std::strlen(testName));
-    write(STDERR_FILENO, testFailureLabel, constexprStrlen(testFailureLabel));
-    
+    writeCharacter(STDERR_FILENO, '\n');
+
     constexpr char potentialErrorLabel[] = "Potential error: ";
     write(STDERR_FILENO, potentialErrorLabel, constexprStrlen(potentialErrorLabel));
     writePotentialError(STDERR_FILENO, potentialError);
-    write(STDERR_FILENO, "\n", 1);
+    writeCharacter(STDERR_FILENO, '\n');
     
-    constexpr char signalLabel[] = "Signal 11: Segmentation Fault";
+    constexpr char signalLabel[] = "Signal 11: Segmentation Fault\n";
     write(STDERR_FILENO, signalLabel, constexprStrlen(signalLabel));
     exit(-1);
   });
   
   try {
     potentialError.newTest(functionName);
-    Result result = functionPtr();
-    if (!result) {
+    if (const Result result = functionPtr(); !result) {
       throw std::runtime_error(
       ((std::string{"Function call failed:\n"} += functionName) += '\n') += result.message);
     }
-  } catch (const std::runtime_error &e) {
-    throw e;
+  } catch (const std::runtime_error &) {
+    throw;
   } catch (const std::exception &e) {
     if (potentialError.isNull())
       std::cerr << "Call to " << functionName << "failed\nUnknown error" << std::endl;
