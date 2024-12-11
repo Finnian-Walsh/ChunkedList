@@ -1,3 +1,7 @@
+#pragma once
+
+#include <queue>
+
 #include "ChunkedListUtility.hpp"
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
