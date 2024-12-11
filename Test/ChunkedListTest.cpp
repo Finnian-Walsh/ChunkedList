@@ -8,6 +8,8 @@
 template<size_t ChunkSize = 32, typename T = int, bool ShouldCopy = false>
 using TestChunkedList = ChunkedList<T, ChunkSize, ShouldCopy>;
 
+using namespace TestUtility;
+
 int main() {
   BEGIN
   
