@@ -4,7 +4,7 @@
 #include "ChunkedListMacros.hpp"
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
-ChunkedList<T, ChunkSize, ShouldCopy>::Chunk::Chunk(ChunkedList::Chunk *nextChunk, ChunkedList::Chunk *prevChunk)
+ChunkedList<T, ChunkSize, ShouldCopy>::Chunk::Chunk(Chunk *nextChunk, Chunk *prevChunk)
 : nextChunk(nextChunk), prevChunk(prevChunk) {}
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
@@ -50,7 +50,7 @@ initializerList.size()) {
 }
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
-ChunkedList<T, ChunkSize, ShouldCopy>::Chunk &
+typename ChunkedList<T, ChunkSize, ShouldCopy>::Chunk &
 ChunkedList<T, ChunkSize, ShouldCopy>::Chunk::operator+(const size_t offset) {
   Chunk *chunk{this};
   
@@ -61,7 +61,7 @@ ChunkedList<T, ChunkSize, ShouldCopy>::Chunk::operator+(const size_t offset) {
 }
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
-ChunkedList<T, ChunkSize, ShouldCopy>::Chunk &
+typename ChunkedList<T, ChunkSize, ShouldCopy>::Chunk &
 ChunkedList<T, ChunkSize, ShouldCopy>::Chunk::operator-(const size_t offset) {
   Chunk *chunk{this};
   
