@@ -3,48 +3,48 @@
 #include "StandardChunkedList.hpp"
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
-StandardChunkedList<T, ChunkSize, ShouldCopy>::ChunkIterator StandardChunkedList<T, ChunkSize, ShouldCopy>::begin_chunk() {
-  return DerivedChunkedList::beginChunk();
+typename chunked_list<T, ChunkSize, ShouldCopy>::chunk_iterator chunked_list<T, ChunkSize, ShouldCopy>::begin_chunk() {
+  return derived_chunked_list::beginChunk();
 }
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
-StandardChunkedList<T, ChunkSize, ShouldCopy>::ChunkIterator StandardChunkedList<T, ChunkSize, ShouldCopy>::end_chunk() {
-  return DerivedChunkedList::endChunk();
+typename chunked_list<T, ChunkSize, ShouldCopy>::chunk_iterator chunked_list<T, ChunkSize, ShouldCopy>::end_chunk() {
+  return derived_chunked_list::endChunk();
 }
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
-void StandardChunkedList<T, ChunkSize, ShouldCopy>::push_back(DerivedChunkedList::ValueType value) {
-  DerivedChunkedList::push(value);
+void chunked_list<T, ChunkSize, ShouldCopy>::push_back(typename derived_chunked_list::ValueType value) {
+  derived_chunked_list::push(value);
 }
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
-void StandardChunkedList<T, ChunkSize, ShouldCopy>::pop_back() {
-  DerivedChunkedList::pop();
+void chunked_list<T, ChunkSize, ShouldCopy>::pop_back() {
+  derived_chunked_list::pop();
 }
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
-void StandardChunkedList<T, ChunkSize, ShouldCopy>::pop_back_chunk() {
-  DerivedChunkedList::popChunk();
+void chunked_list<T, ChunkSize, ShouldCopy>::pop_back_chunk() {
+  derived_chunked_list::popChunk();
 }
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
-size_t StandardChunkedList<T, ChunkSize, ShouldCopy>::length() const {
-  return DerivedChunkedList::size();
+size_t chunked_list<T, ChunkSize, ShouldCopy>::length() const {
+  return derived_chunked_list::size();
 }
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
-StandardChunkedList<T, ChunkSize, ShouldCopy>::ConstIterator
-begin(StandardChunkedList<T, ChunkSize, ShouldCopy> &standardChunkedList) {
+typename chunked_list<T, ChunkSize, ShouldCopy>::ConstIterator
+begin(chunked_list<T, ChunkSize, ShouldCopy> &standardChunkedList) {
   return standardChunkedList.begin();
 }
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
-StandardChunkedList<T, ChunkSize, ShouldCopy>::ConstIterator
-end(StandardChunkedList<T, ChunkSize, ShouldCopy> &standardChunkedList) {
+typename chunked_list<T, ChunkSize, ShouldCopy>::ConstIterator
+end(chunked_list<T, ChunkSize, ShouldCopy> &standardChunkedList) {
   return standardChunkedList.begin();
 }
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
-std::ostream &operator<<(std::ostream &os, StandardChunkedList<T, ChunkSize, ShouldCopy> &standardChunkedList) {
+std::ostream &operator<<(std::ostream &os, chunked_list<T, ChunkSize, ShouldCopy> &standardChunkedList) {
   return operator<<(os, static_cast<ChunkedList<T, ChunkSize, ShouldCopy>>(standardChunkedList));
 }
