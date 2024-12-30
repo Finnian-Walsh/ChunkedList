@@ -10,6 +10,13 @@
 #define RETURN_IF(condition, str) if (condition) return Result{str};
 
 namespace TestUtility {
+#ifdef LOG_LEVEL
+  constexpr inline int LogLevel = LOG_LEVEL;
+#else
+  constexpr inline int LogLevel = 0;
+#endif
+
+
   inline int testNumber{1};
 
   class RandomNumberGenerator {
@@ -39,19 +46,19 @@ namespace TestUtility {
 
       void set(const std::string &str);
 
+      void set(std::string &&str);
+
       const std::string &str() const;
 
       const char *c_str() const;
 
-      const char *getTestPtr() const;
-
-      const std::string &getTestStr() const;
+      const std::string &getTest() const;
 
       PotentialError &operator=(const char *str);
 
-      PotentialError &operator=(std::string &&str);
-
       PotentialError &operator=(const std::string &str);
+
+      PotentialError &operator=(std::string &&str);
 
       void newTest(const std::string &str);
 
@@ -76,5 +83,37 @@ namespace TestUtility {
       operator bool() const;
   };
 
+  class ResultPointer {
+    Result *pointer{nullptr};
+
+    public:
+      ResultPointer() = default;
+
+      explicit ResultPointer(Result *result);
+
+      explicit ResultPointer(const Result &result);
+
+      explicit ResultPointer(Result &&result);
+
+      ~ResultPointer();
+
+      Result &operator*();
+
+      const Result &operator*() const;
+
+      Result *operator->();
+
+      const Result *operator->() const;
+
+      ResultPointer &operator=(Result *result);
+
+      ResultPointer &operator=(const Result &result);
+
+      ResultPointer &operator=(Result &&result);
+
+  };
+
   void callFunction(const char *functionName, Result (*functionPtr)());
+
+  void performOperation(const char *operationName, int logLevel = 1);
 }

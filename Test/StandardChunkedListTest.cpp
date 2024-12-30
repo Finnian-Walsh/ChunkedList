@@ -6,7 +6,9 @@
 #include "core/TestUtility.hpp"
 
 template<size_t ChunkSize = 32, typename T = int, bool ShouldCopy = false>
-using TestChunkedList = StandardChunkedList<T, ChunkSize, ShouldCopy>;
+using TestChunkedList = chunked_list<T, ChunkSize, ShouldCopy>;
+
+using namespace TestUtility;
 
 int main() {
   BEGIN

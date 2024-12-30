@@ -1,9 +1,22 @@
-#ifndef CHUNKED_LIST_UTILITY_HPP
-#define CHUNKED_LIST_UTILITY_HPP
+#pragma once
 
-#include "ChunkedList.hpp"
+#include <type_traits>
+#include <cstddef>
+
+template<typename T, size_t ChunkSize, bool ShouldCopy>
+class ChunkedList;
 
 namespace ChunkedListUtility {
+
+  enum SortType {
+      BubbleSort,
+      SelectionSort,
+      InsertionSort,
+      MergeSort,
+      QuickSort,
+      HeapSort,
+  };
+
   template<typename, typename, typename = void>
   class has_insertion_operator : public std::false_type {
   };
@@ -16,20 +29,33 @@ namespace ChunkedListUtility {
   
   template<typename Class, typename Parameter>
   constexpr bool has_insertion_operator_v = has_insertion_operator<Class, Parameter>::value;
-  
-  template<typename T, size_t ChunkSize, bool ShouldCopy>
-  void ascendingSort(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList);
-  
-  template<typename T, size_t ChunkSize, bool ShouldCopy>
-  void descendingSort(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList);
+
+  template<typename Compare, SortType Sort, typename T, size_t ChunkSize, bool ShouldCopy>
+  void sort(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList);
+
+  namespace SortFunctions {
+    template<typename Compare, typename T, size_t ChunkSize, bool ShouldCopy>
+    void bubbleSort(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList);
+
+    template<typename Compare, typename T, size_t ChunkSize, bool ShouldCopy>
+    void selectionSort(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList);
+
+    template<typename Compare, typename T, size_t ChunkSize, bool ShouldCopy>
+    void insertionSort(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList);
+
+    template<typename Compare, typename T, size_t ChunkSize, bool ShouldCopy>
+    void mergeSort(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList);
+
+    template<typename Compare, typename T, size_t ChunkSize, bool ShouldCopy>
+    void quickSort(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList);
+
+    template<typename Compare, typename T, size_t ChunkSize, bool ShouldCopy>
+    void quickSort(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList, size_t start, size_t end);
+
+    template<typename Compare, typename T, size_t ChunkSize, bool ShouldCopy>
+    void heapSort(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList);
+  }
 }
 
 #include "../src/ChunkedListUtility.tpp"
 
-void test_function() {
-  ChunkedList<int, 32, false> list;
-  
-  list.sort();
-}
-
-#endif

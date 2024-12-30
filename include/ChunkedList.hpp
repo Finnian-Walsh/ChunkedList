@@ -1,17 +1,12 @@
-#ifndef CHUNKED_LIST_HPP
-#define CHUNKED_LIST_HPP
+#pragma once
 
+#include <ChunkedListUtility.hpp>
 #include <sstream>
 #include <initializer_list>
 #include <cstring>
-#include <algorithm>
 #include <functional>
-#include <queue> // for std::priority_queue
-#include <vector> // for std::vector
 
 #ifdef CHUNKED_LIST_DEBUGGING
-
-#include <iostream> // for character output
 
 #endif
 
@@ -46,7 +41,9 @@ class ChunkedList {
         
         Chunk *nextChunk{nullptr};
         Chunk *prevChunk{nullptr};
-        
+
+        bool empty() const;
+
         T &operator[](size_t index);
         
         const T &operator[](size_t index) const;
@@ -54,6 +51,8 @@ class ChunkedList {
         bool operator==(const Chunk &other) const;
         
         bool operator!=(const Chunk &other) const;
+
+        void debugData(std::string &str) const;
     };
     
     Chunk *front{nullptr};
@@ -62,7 +61,7 @@ class ChunkedList {
     void pushChunk(Chunk *chunk);
   
   public:
-    using ValueType = typename std::conditional_t<ShouldCopy, T, const T &>;
+    using ValueType = std::conditional_t<ShouldCopy, T, const T &>;
     
     ChunkedList();
     
@@ -74,9 +73,9 @@ class ChunkedList {
     
     class ChunkIterator {
       public:
+        virtual ~ChunkIterator() = default;
+
         explicit ChunkIterator(Chunk *chunk);
-        
-        ~ChunkIterator() = default;
         
         ChunkIterator operator++();
         
@@ -118,12 +117,10 @@ class ChunkedList {
         Chunk *chunk;
     };
     
-    class ConstChunkIterator final : private ChunkIterator {
+    class ConstChunkIterator final : ChunkIterator {
       public:
         explicit ConstChunkIterator(Chunk *chunk);
-        
-        ~ConstChunkIterator() = default;
-        
+
         using ChunkIterator::operator++;
         
         using ChunkIterator::operator--;
@@ -163,7 +160,7 @@ class ChunkedList {
         explicit Iterator(ChunkIterator chunkIterator);
         
         Iterator(ChunkIterator chunkIterator, size_t index);
-        
+
         ~Iterator() = default;
         
         Iterator operator++();
@@ -186,9 +183,9 @@ class ChunkedList {
         
         T *operator->();
         
-        virtual const T &operator*() const;
+        const T &operator*() const;
         
-        virtual const T *operator->() const;
+        const T *operator->() const;
         
         bool operator==(Iterator other) const;
         
@@ -203,7 +200,7 @@ class ChunkedList {
         size_t index{0};
     };
     
-    class ConstIterator : private Iterator {
+    class ConstIterator final : Iterator {
       public:
         explicit ConstIterator(const Chunk *chunk);
         
@@ -231,9 +228,9 @@ class ChunkedList {
         
         using Iterator::operator-=;
         
-        const T &operator*() const override;
+        const T &operator*() const;
         
-        const T *operator->() const override;
+        const T *operator->() const;
         
         using Iterator::operator==;
         
@@ -246,11 +243,11 @@ class ChunkedList {
     
     Iterator begin();
     
-    [[nodiscard]] ConstIterator begin() const;
+    ConstIterator begin() const;
     
     Iterator end();
     
-    [[nodiscard]] ConstIterator end() const;
+    ConstIterator end() const;
     
     ChunkIterator beginChunk();
     
@@ -261,15 +258,13 @@ class ChunkedList {
     void pop();
     
     void popChunk();
-    
-    template<bool AscendingOrder = true>
+
+    template<typename Compare = std::less<T>, SortType Sort = QuickSort>
     void sort();
+
+    size_t size() const;
     
-    void sort(bool ascendingOrder);
-    
-    [[nodiscard]] size_t size() const;
-    
-    [[nodiscard]] bool empty() const;
+    bool empty() const;
     
     bool operator==(const ChunkedList &other) const;
     
@@ -288,12 +283,20 @@ class ChunkedList {
 };
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
-ChunkedList<T, ChunkSize, ShouldCopy>::ConstIterator
+typename ChunkedList<T, ChunkSize, ShouldCopy>::ConstIterator
 begin(const ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList) noexcept;
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
-ChunkedList<T, ChunkSize, ShouldCopy>::ConstIterator
+typename ChunkedList<T, ChunkSize, ShouldCopy>::Iterator
+begin(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList) noexcept;
+
+template<typename T, size_t ChunkSize, bool ShouldCopy>
+typename ChunkedList<T, ChunkSize, ShouldCopy>::ConstIterator
 end(const ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList) noexcept;
+
+template<typename T, size_t ChunkSize, bool ShouldCopy>
+typename ChunkedList<T, ChunkSize, ShouldCopy>::Iterator
+end(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList) noexcept;
 
 #undef DEBUG_LOG
 #undef DEBUG_LINE
@@ -302,5 +305,4 @@ end(const ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList) noexcept;
 #include "../src/ChunkedList.tpp"
 #include "../src/ChunkedListChunk.tpp"
 #include "../src/ChunkedListIterator.tpp"
-
-#endif
+#include "../src/ChunkedListUtility.tpp"
