@@ -118,9 +118,9 @@ void SortFunctions::quickSort(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList
 }
 
 template<typename Compare, typename T, size_t ChunkSize, bool ShouldCopy>
-void SortFunctions::quickSort(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList, size_t start, size_t end) {
+void SortFunctions::quickSort(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList, typename ChunkedList<T, ChunkSize, ShouldCopy>::Iterator start, typename ChunkedList<T, ChunkSize, ShouldCopy>::Iterator end) {
 
-  // TODO: Implement quick sort
+  // TODO: Implement
 
 }
 
