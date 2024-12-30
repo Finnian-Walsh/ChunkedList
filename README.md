@@ -111,8 +111,8 @@ The **ChunkedList** data structure uses `camelCase`. However, if you would like 
 #include "StandardChunkedList.hpp"
 ```
 
-to your code instead. This gives you access to the **StandardChunkedList** data structure, which has all the same
-methods of the **ChunkedList**, only written in snake case.
+to your code instead. This gives you access to the **chunked_list** data structure, which has all the same
+methods of the **ChunkedList**, but written in snake case.
 
 ### Standard Chunked List Examples
 
@@ -122,7 +122,7 @@ methods of the **ChunkedList**, only written in snake case.
 #include <random>
 
 int main() {
-  StandardChunkedList<int, 32> chunkedList{};
+  chunked_list<int, 32> chunkedList{};
   
   std::mt19937 gen{std::random_device{}};
   std::uniform_int_distrubition<int> dist{1, 100};
