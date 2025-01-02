@@ -47,10 +47,7 @@ namespace ChunkedListUtility {
     void mergeSort(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList);
 
     template<typename Compare, typename T, size_t ChunkSize, bool ShouldCopy>
-    void quickSort(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList);
-
-    template<typename Compare, typename T, size_t ChunkSize, bool ShouldCopy>
-    void quickSort(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList, typename ChunkedList<T, ChunkSize, ShouldCopy>::Iterator start, typename ChunkedList<T, ChunkSize, ShouldCopy>::Iterator end);
+    void quickSort(typename ChunkedList<T, ChunkSize, ShouldCopy>::Iterator start, typename ChunkedList<T, ChunkSize, ShouldCopy>::Iterator end);
 
     template<typename Compare, typename T, size_t ChunkSize, bool ShouldCopy>
     void heapSort(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList);
