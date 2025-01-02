@@ -1,13 +1,12 @@
 #pragma once
 
-#include <iostream>
+#include <ChunkedList.hpp>
 #include <unistd.h>
 #include <random>
 
 #define BEGIN std::cout << "Starting tests..." << std::endl;
-#define CALL_TEST(functionName, functionPtr) std::cout << "Test " << testNumber << ": " << functionName << '\n'; callFunction(functionName, functionPtr); std::cout << "Test " << testNumber << " successful" << std::endl; ++testNumber;
 #define SUCCESS std::cout << "All " << testNumber - 1 << " tests have been ran."; return EXIT_SUCCESS;
-#define RETURN_IF(condition, str) if (condition) return Result{str};
+#define THROW_IF(condition, str) if (condition) { throw std::runtime_error(str); }
 
 namespace TestUtility {
 #ifdef LOG_LEVEL
@@ -28,92 +27,61 @@ namespace TestUtility {
       int operator()(int min, int max);
   };
 
-  inline class PotentialError {
+  inline class TestData {
     std::string test{};
-    std::string error{};
-    bool null{true};
+    std::string source{};
+    std::string task{};
+
+    bool nullSource{true};
+    bool nullTask{true};
 
     public:
-      PotentialError() = default;
+      TestData() = default;
 
-      explicit PotentialError(const char *str);
+      explicit TestData(const char *str);
 
-      explicit PotentialError(std::string &&str);
+      explicit TestData(std::string &&str);
 
-      explicit PotentialError(const std::string &str);
+      void setSource(const char *str);
 
-      void set(const char *str);
+      void setSource(std::string &&str);
 
-      void set(const std::string &str);
+      void setTask(const char *str);
 
-      void set(std::string &&str);
-
-      const std::string &str() const;
-
-      const char *c_str() const;
+      void setTask(std::string &&str);
 
       const std::string &getTest() const;
 
-      PotentialError &operator=(const char *str);
+      const std::string &getSource() const;
 
-      PotentialError &operator=(const std::string &str);
-
-      PotentialError &operator=(std::string &&str);
+      const std::string &getTask() const;
 
       void newTest(const std::string &str);
 
-      bool isNull() const;
-  } potentialError;
+      bool sourceIsNull() const;
 
-  class Result {
-    public:
-      const std::string message{};
-      const bool status{false};
+      bool taskIsNull() const;
+  } testData;
 
-      explicit Result(bool status);
+  void callFunction(const char *functionName, void (*functionPtr)());
 
-      explicit Result(std::string &&message);
+  void performTask(const char *taskName, int logLevel = 10);
 
-      explicit Result(const std::string &message);
-
-      explicit Result(const char *message);
-
-      bool operator!() const;
-
-      operator bool() const;
-  };
-
-  class ResultPointer {
-    Result *pointer{nullptr};
+  template<typename T, size_t ChunkSize, bool ShouldCopy>
+  class ChunkedListAccessor final : ChunkedList<T, ChunkSize, ShouldCopy> {
+    using DerivedChunkedList = ChunkedList<T, ChunkSize, ShouldCopy>;
 
     public:
-      ResultPointer() = default;
+      size_t getChunkCount() {
+        return this->chunkCount;
+      }
 
-      explicit ResultPointer(Result *result);
+      typename DerivedChunkedList::Chunk *getFront() {
+        return this->front;
+      }
 
-      explicit ResultPointer(const Result &result);
-
-      explicit ResultPointer(Result &&result);
-
-      ~ResultPointer();
-
-      Result &operator*();
-
-      const Result &operator*() const;
-
-      Result *operator->();
-
-      const Result *operator->() const;
-
-      ResultPointer &operator=(Result *result);
-
-      ResultPointer &operator=(const Result &result);
-
-      ResultPointer &operator=(Result &&result);
-
+      typename DerivedChunkedList::Chunk *getBack() {
+        return this->back;
+      }
   };
-
-  void callFunction(const char *functionName, Result (*functionPtr)());
-
-  void performOperation(const char *operationName, int logLevel = 1);
 }
