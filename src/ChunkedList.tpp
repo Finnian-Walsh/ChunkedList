@@ -61,23 +61,24 @@ ChunkedList<T, ChunkSize, ShouldCopy>::ChunkedList(const std::initializer_list<T
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
 ChunkedList<T, ChunkSize, ShouldCopy>::~ChunkedList() {
-  while (back) popChunk();
+  do {
+    Chunk *newBack = back->prevChunk;
+    delete back;
+    back = newBack;
+  } while (back);
 }
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
 T &ChunkedList<T, ChunkSize, ShouldCopy>::operator[](const size_t index) {
-  const int chunkIndex = (index + 1) / ChunkSize;
+  size_t chunkIndex = index / ChunkSize;
+
   Chunk *chunk = front;
 
-  for (int i = 1; i < chunkIndex; ++i)
+  while (chunkIndex-- > 0) {
     chunk = chunk->nextChunk;
+  }
 
-  std::string chunkStr{};
-  chunk->debugData(chunkStr);
-
-  std::cout << chunkStr << std::endl;
-
-  return chunk->operator[](index % ChunkSize);
+  return (*chunk)[index % ChunkSize];
 }
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
@@ -120,11 +121,15 @@ void ChunkedList<T, ChunkSize, ShouldCopy>::push(ValueType value) {
   if (back->nextIndex == ChunkSize) {
     if constexpr (ShouldCopy) {
       auto *nextChunk = new Chunk{value};
+      ++chunkCount;
+
       nextChunk->prevChunk = back;
       back->nextChunk = nextChunk;
       back = nextChunk;
     } else {
       auto *nextChunk = new Chunk{std::move(value)};
+      ++chunkCount;
+
       nextChunk->prevChunk = back;
       back->nextChunk = nextChunk;
       back = nextChunk;
@@ -148,9 +153,12 @@ void ChunkedList<T, ChunkSize, ShouldCopy>::pop() {
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
 void ChunkedList<T, ChunkSize, ShouldCopy>::popChunk() {
-  Chunk *newBack = back->prevChunk;
-  delete back;
-  back = newBack;
+  if (Chunk *newBack = back->prevChunk; newBack) {
+    delete back;
+    back = newBack;
+    --chunkCount;
+    --back->nextIndex;
+  }
 }
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
@@ -162,7 +170,7 @@ void ChunkedList<T, ChunkSize, ShouldCopy>::sort() {
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
 size_t ChunkedList<T, ChunkSize, ShouldCopy>::size() const {
-  return (chunkCount * ChunkSize) + back->nextIndex - 1;
+  return (chunkCount - 1) * ChunkSize + back->nextIndex;
 }
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
@@ -170,12 +178,15 @@ bool ChunkedList<T, ChunkSize, ShouldCopy>::empty() const {
   return back->nextIndex == 0;
 }
 
+/**
+ * @brief returns true if every item in the other chunked list is the same as in the given chunked list
+ */
 template<typename T, size_t ChunkSize, bool ShouldCopy>
 bool ChunkedList<T, ChunkSize, ShouldCopy>::operator==(const ChunkedList &other) const {
   if (size() != other.size())
     return false;
 
-  for (ChunkedList<T, ChunkSize, ShouldCopy>::ConstIterator thisIterator = begin(), otherIterator = other.begin();
+  for (ConstIterator thisIterator = begin(), otherIterator = other.begin();
        thisIterator != end(); ++thisIterator, ++otherIterator)
     if (*thisIterator != *otherIterator)
       return false;
@@ -190,7 +201,7 @@ bool ChunkedList<T, ChunkSize, ShouldCopy>::operator!=(const ChunkedList &other)
 
   for (ConstIterator thisIterator = begin(), otherIterator = other.begin();
        thisIterator != end(); ++thisIterator, ++otherIterator)
-    if (thisIterator != otherIterator)
+    if (*thisIterator != *otherIterator)
       return true;
 
   return false;
@@ -237,7 +248,7 @@ StringType ChunkedList<T, ChunkSize, ShouldCopy>::concat(const DelimiterType del
     DEBUG_LOG(stream.str() << '\n');
   }
 
-  stream << *++lastIt;
+  stream << *lastIt;
 
   if constexpr (ConversionCall == nullptr) {
     return StringType{stream.str()};
