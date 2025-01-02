@@ -1,5 +1,6 @@
-#ifndef STANDARD_CHUNKED_LIST
-#define STANDARD_CHUNKED_LIST
+#pragma once
+
+#include <ostream>
 
 #include "ChunkedList.hpp"
 
@@ -54,5 +55,3 @@ class chunked_list final
 };
 
 #include "../src/StandardChunkedList.tpp"
-
-#endif
