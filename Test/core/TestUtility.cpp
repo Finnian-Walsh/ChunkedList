@@ -1,9 +1,6 @@
 #include "TestUtility.hpp"
 
 #include <cstdlib>
-#include <csignal>
-#include <cstring>
-#include <climits>
 
 using namespace TestUtility;
 
@@ -14,150 +11,79 @@ int RandomNumberGenerator::operator()(const int min, const int max) {
   return std::uniform_int_distribution{min, max}(engine);
 }
 
-PotentialError::PotentialError(const char *str) : error{str}, null{false} {
+TestData::TestData(const char *str) : source{str}, nullSource{false} {
 }
 
-PotentialError::PotentialError(std::string &&str) : error{std::move(str)}, null{false} {
+TestData::TestData(std::string &&str) : source{std::move(str)}, nullSource{false} {
 }
 
-PotentialError::PotentialError(const std::string &str) : error{str}, null{false} {
+
+void TestData::setSource(const char *str) {
+  source = str;
+  nullSource = false;
 }
 
-void PotentialError::set(const char *str) {
-  error = str;
+void TestData::setSource(std::string &&str) {
+  source = std::move(str);
 }
 
-const std::string &PotentialError::str() const {
-  return error;
+void TestData::setTask(std::string &&str) {
+  task = std::move(str);
+  nullTask = false;
 }
 
-const char *PotentialError::c_str() const {
-  return error.c_str();
+void TestData::setTask(const char *str) {
+  task = str;
+  nullTask = false;
 }
 
-const std::string &PotentialError::getTest() const {
+const std::string &TestData::getTest() const {
   return test;
 }
 
-PotentialError &PotentialError::operator=(const char *str) {
-  error = str;
-  return *this;
+const std::string &TestData::getSource() const {
+  return source;
 }
 
-PotentialError &PotentialError::operator=(std::string &&str) {
-  error = std::move(str);
-  return *this;
+const std::string &TestData::getTask() const {
+  return task;
 }
 
-PotentialError &PotentialError::operator=(const std::string &str) {
-  error = str;
-  return *this;
-};
-
-void PotentialError::newTest(const std::string &str) {
+void TestData::newTest(const std::string &str) {
   test = str;
-  null = true;
-  error.clear();
+  nullSource = true;
+  nullTask = true;
 }
 
-bool PotentialError::isNull() const {
-  return null;
+bool TestData::sourceIsNull() const {
+  return nullSource;
 }
 
-Result::Result(const bool status) : status{status} {
+bool TestData::taskIsNull() const {
+  return nullTask;
 }
 
-Result::Result(std::string &&message) : message{std::move(message)} {
-}
-
-Result::Result(const std::string &message) : message{message} {
-}
-
-Result::Result(const char *message) : message{message} {
-}
-
-bool Result::operator!() const {
-  return !status;
-}
-
-Result::operator bool() const {
-  return status;
-}
-
-ResultPointer::ResultPointer(Result *result) : pointer(result) {
-}
-
-ResultPointer::ResultPointer(Result &&result) : pointer(new Result{std::move(result)}) {
-}
-
-ResultPointer::~ResultPointer() {
-  if (pointer) {
-    delete pointer;
-  }
-}
-
-Result &ResultPointer::operator*() {
-  return *pointer;
-}
-
-const Result &ResultPointer::operator*() const {
-  return *pointer;
-}
-
-Result *ResultPointer::operator->() {
-  return pointer;
-}
-
-const Result *ResultPointer::operator->() const {
-  return pointer;
-}
-
-ResultPointer &ResultPointer::operator=(Result *result) {
-  if (pointer) delete pointer;
-
-  pointer = result;
-
-  return *this;
-}
-
-ResultPointer &ResultPointer::operator=(const Result &result) {
-  if (pointer) delete pointer;
-
-  pointer = new Result{result};
-
-  return *this;
-}
-
-ResultPointer &ResultPointer::operator=(Result &&result) {
-  if (pointer) delete pointer;
-
-  pointer = new Result{std::move(result)};
-
-  return *this;
-}
-
-void TestUtility::callFunction(const char *functionName, Result (*functionPtr)()) {
-  ResultPointer resultPtr{};
+void TestUtility::callFunction(const char *functionName, void (*functionPtr)()) {
+  std::cout << "Test " << testNumber << ": " << functionName << '\n';
 
   try {
-    potentialError.newTest(functionName);
-    resultPtr = functionPtr();
+    testData.newTest(functionName);
+    functionPtr();
   } catch (const std::exception &e) {
     throw std::runtime_error(
-      std::string{"Call to "}.operator+=(functionName).operator+=("failed\nError: ").operator+=(e.what()).operator
-      +=("\nPotential error: ").operator+=(potentialError.isNull() ? "unknown" : potentialError.str()).
-      operator+=('\n'));
+      std::string{"Call to "}.operator+=(functionName).operator+=(" failed\nSource: ").operator+=(
+        testData.sourceIsNull() ? "NULL" : testData.getSource()).
+      operator+=("\nTask: ").operator+=(testData.taskIsNull() ? "NULL" : testData.getTask()).operator+=("\nError: ").
+      operator+=(e.what()));
   }
 
-  if (!*resultPtr) {
-    throw std::runtime_error(
-      std::string{"Function call failed:\n"}.operator+=(functionName).operator+=('\n').operator+=(resultPtr->message));
-  }
+  std::cout << "Test " << testNumber << " successful\n" << std::endl;
+  ++testNumber;
 }
 
-void TestUtility::performOperation(const char *operationName, const int logLevel) {
-  potentialError = operationName;
+void TestUtility::performTask(const char *taskName, const int logLevel) {
+  testData.setTask(taskName);
   if (logLevel <= LogLevel) {
-    std::cout << operationName << '\n';
+    std::cout << taskName << '\n';
   }
 }
