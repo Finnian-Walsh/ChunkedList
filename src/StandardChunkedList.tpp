@@ -33,18 +33,6 @@ size_t chunked_list<T, ChunkSize, ShouldCopy>::length() const {
 }
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
-typename chunked_list<T, ChunkSize, ShouldCopy>::ConstIterator
-begin(chunked_list<T, ChunkSize, ShouldCopy> &standardChunkedList) {
-  return standardChunkedList.begin();
-}
-
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-typename chunked_list<T, ChunkSize, ShouldCopy>::ConstIterator
-end(chunked_list<T, ChunkSize, ShouldCopy> &standardChunkedList) {
-  return standardChunkedList.begin();
-}
-
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-std::ostream &operator<<(std::ostream &os, chunked_list<T, ChunkSize, ShouldCopy> &standardChunkedList) {
-  return operator<<(os, static_cast<ChunkedList<T, ChunkSize, ShouldCopy>>(standardChunkedList));
+std::ostream &operator<<(std::ostream &os, chunked_list<T, ChunkSize, ShouldCopy> &chunkedList) {
+  return operator<<(os, static_cast<ChunkedList<T, ChunkSize, ShouldCopy>>(chunkedList));
 }
