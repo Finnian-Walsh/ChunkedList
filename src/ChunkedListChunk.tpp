@@ -119,6 +119,6 @@ void ChunkedList<T, ChunkSize, ShouldCopy>::Chunk::debugData(std::string &str) c
   }
 
 end:
-  oss << ")\n";
+  oss << ')';
   str = oss.str();
 }
