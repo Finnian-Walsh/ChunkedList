@@ -84,4 +84,30 @@ namespace TestUtility {
         return this->back;
       }
   };
+
+  namespace Tests {
+    using DefaultT = int;
+    constexpr size_t DefaultChunkSize = 32;
+    constexpr bool DefaultShouldCopy = true;
+
+    template<template <typename, size_t, bool> typename ChunkedListType, size_t ChunkSize>
+    void FrontAndBack();
+
+    template<template <typename, size_t, bool> typename ChunkedListType, size_t ChunkSize>
+    void ConcatenationAndIndexing();
+
+    template<template <typename, size_t, bool> typename ChunkedListType, size_t ChunkSize>
+    void EqualityAndInequality();
+
+    template<SortType SortingAlgorithm, template<typename, size_t, bool> typename ChunkedListType>
+    void Sorting();
+
+    template<template <typename, size_t, bool> typename ChunkedListType, size_t ChunkSize>
+    void Insertion();
+
+    template<template <typename, size_t, bool> typename ChunkedListType, size_t ChunkSize>
+    void Iterators();
+  }
 }
+
+#include "TestUtility.tpp"

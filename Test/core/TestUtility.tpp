@@ -30,13 +30,13 @@ inline void TestData::setSource(std::string &&str) {
   source = std::move(str);
 }
 
-inline void TestData::setTask(std::string &&str) {
-  task = std::move(str);
+inline void TestData::setTask(const char *str) {
+  task = str;
   nullTask = false;
 }
 
-inline void TestData::setTask(const char *str) {
-  task = str;
+inline void TestData::setTask(std::string &&str) {
+  task = std::move(str);
   nullTask = false;
 }
 
