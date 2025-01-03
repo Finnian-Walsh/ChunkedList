@@ -94,19 +94,22 @@ namespace TestUtility {
     void FrontAndBack();
 
     template<template <typename, size_t, bool> typename ChunkedListType, size_t ChunkSize>
-    void ConcatenationAndIndexing();
-
-    template<template <typename, size_t, bool> typename ChunkedListType, size_t ChunkSize>
-    void EqualityAndInequality();
+    void Insertion();
 
     template<SortType SortingAlgorithm, template<typename, size_t, bool> typename ChunkedListType>
     void Sorting();
 
     template<template <typename, size_t, bool> typename ChunkedListType, size_t ChunkSize>
-    void Insertion();
+    void Iterators();
 
     template<template <typename, size_t, bool> typename ChunkedListType, size_t ChunkSize>
-    void Iterators();
+    void PushingAndPopping();
+
+    template<template <typename, size_t, bool> typename ChunkedListType, size_t ChunkSize>
+    void EqualityAndInequality();
+
+    template<template <typename, size_t, bool> typename ChunkedListType, size_t ChunkSize>
+    void ConcatenationAndIndexing();
   }
 }
 

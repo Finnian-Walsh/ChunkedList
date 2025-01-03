@@ -116,6 +116,112 @@ void Tests::FrontAndBack() {
 }
 
 template<template <typename, size_t, bool> typename ChunkedListType, size_t ChunkSize>
+void Tests::Insertion() {
+  using ListType = ChunkedListType<DefaultT, ChunkSize, DefaultShouldCopy>;
+
+  ListType chunkedList{5, 10, 15};
+  std::string expectedOutput{"[5, 10, 15"};
+
+  RandomNumberGenerator rng;
+
+  for (int i = 0; i < 1000; ++i) {
+    int num = rng(-1000, 1000);
+    expectedOutput += ", ";
+    expectedOutput += std::to_string(num);
+    chunkedList.push(num);
+  }
+
+  expectedOutput.push_back(']');
+
+  performTask("Inserting ChunkedList into ostream");
+  std::ostringstream os{};
+  os << chunkedList;
+
+  THROW_IF(os.str() != expectedOutput,
+           std::string("ostream insertion ran incorrectly\nGot: ") += os.str())
+}
+
+template<SortType SortingAlgorithm, template<typename, size_t, bool> typename ChunkedListType>
+void Tests::Sorting() {
+  performTask("List creation");
+  ChunkedListType<DefaultT, DefaultChunkSize, DefaultShouldCopy> list;
+
+  performTask("Random Number Generator creation");
+  RandomNumberGenerator rng;
+
+  performTask("Pushing or using the RNG");
+  for (int i{}; i < 100; ++i) {
+    list.push(rng(1, 100));
+  }
+
+  performTask("Sorting");
+  list.template sort<std::less<DefaultT>, SortingAlgorithm>();
+
+  performTask("Indexing");
+  int last = list[0];
+
+  performTask("Calling begin()");
+  auto iterator = list.begin();
+
+  performTask("Iterator operator+=()");
+  iterator += 1;
+
+  performTask("Calling end()");
+  const auto end = list.end();
+
+  performTask("Iterator inequality");
+  for (; iterator != end; ++iterator) {
+    performTask("Iterator dereferencing");
+    THROW_IF(*iterator < last, "Sorting failed!")
+
+    last = *iterator;
+
+    performTask("Iterator operator++(int)");
+  }
+}
+
+template<template <typename, size_t, bool> typename ChunkedListType, size_t ChunkSize>
+void Tests::PushingAndPopping() {
+  using ListType = ChunkedListType<DefaultT, ChunkSize, DefaultShouldCopy>;
+  ListType chunkedList{};
+
+  performTask("Pushing");
+  for (int i = 0; i < 10; ++i) {
+    chunkedList.push('a');
+    chunkedList.push('b');
+  }
+
+  for (int i = 20; i > 1; --i) {
+    performTask("Calling size()");
+    THROW_IF(i != chunkedList.size(), "Unexpected ChunkedList size")
+
+    performTask("Popping");
+    chunkedList.pop();
+  }
+
+  performTask("Indexing");
+  const char firstItem = chunkedList[0];
+
+  performTask("Comparing first item");
+  THROW_IF(firstItem != 'a', "First item is not 'a'")
+}
+
+template<template <typename, size_t, bool> typename ChunkedListType, size_t ChunkSize>
+void Tests::Iterators() {
+  using ListType = ChunkedListType<DefaultT, ChunkSize, DefaultShouldCopy>;
+
+  performTask("List creation");
+  ListType chunkedList{1, 2, 3, 4, 5};
+  int total{};
+
+  performTask("List iteration (implicit)");
+  for (const int num: chunkedList)
+    total += num;
+
+  THROW_IF(total != 15, "List sum is not 15")
+}
+
+template<template <typename, size_t, bool> typename ChunkedListType, size_t ChunkSize>
 void Tests::ConcatenationAndIndexing() {
   using ListType = ChunkedListType<DefaultT, ChunkSize, DefaultShouldCopy>;
   ListType chunkedList;
@@ -186,84 +292,4 @@ void Tests::EqualityAndInequality() {
 
   performTask("List equality");
   THROW_IF(list1 == list2, "List comparison 4 failed")
-}
-
-template<SortType SortingAlgorithm, template<typename, size_t, bool> typename ChunkedListType>
-void Tests::Sorting() {
-  performTask("List creation");
-  ChunkedListType<DefaultT, DefaultChunkSize, DefaultShouldCopy> list;
-
-  performTask("Random Number Generator creation");
-  RandomNumberGenerator rng;
-
-  performTask("Pushing or using the RNG");
-  for (int i{}; i < 100; ++i) {
-    list.push(rng(1, 100));
-  }
-
-  performTask("Sorting");
-  list.template sort<std::less<DefaultT>, SortingAlgorithm>();
-
-  performTask("Indexing");
-  int last = list[0];
-
-  performTask("Calling begin()");
-  auto iterator = list.begin();
-
-  performTask("Iterator operator+=()");
-  iterator += 1;
-
-  performTask("Calling end()");
-  const auto end = list.end();
-
-  performTask("Iterator inequality");
-  for (; iterator != end; ++iterator) {
-    performTask("Iterator dereferencing");
-    THROW_IF(*iterator < last, "Sorting failed!")
-
-    last = *iterator;
-
-    performTask("Iterator operator++(int)");
-  }
-}
-
-template<template <typename, size_t, bool> typename ChunkedListType, size_t ChunkSize>
-void Tests::Insertion() {
-  using ListType = ChunkedListType<DefaultT, ChunkSize, DefaultShouldCopy>;
-
-  ListType chunkedList{5, 10, 15};
-  std::string expectedOutput{"[5, 10, 15"};
-
-  RandomNumberGenerator rng;
-
-  for (int i = 0; i < 1000; ++i) {
-    int num = rng(-1000, 1000);
-    expectedOutput += ", ";
-    expectedOutput += std::to_string(num);
-    chunkedList.push(num);
-  }
-
-  expectedOutput.push_back(']');
-
-  performTask("Inserting ChunkedList into ostream");
-  std::ostringstream os{};
-  os << chunkedList;
-
-  THROW_IF(os.str() != expectedOutput,
-           std::string("ostream insertion ran incorrectly\nGot: ") += os.str())
-}
-
-template<template <typename, size_t, bool> typename ChunkedListType, size_t ChunkSize>
-void Tests::Iterators() {
-  using ListType = ChunkedListType<DefaultT, ChunkSize, DefaultShouldCopy>;
-
-  performTask("List creation");
-  ListType chunkedList{1, 2, 3, 4, 5};
-  int total{};
-
-  performTask("List iteration (implicit)");
-  for (const int num: chunkedList)
-    total += num;
-
-  THROW_IF(total != 15, "List sum is not 15")
 }
