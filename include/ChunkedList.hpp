@@ -146,6 +146,14 @@ class ChunkedList {
 
     class Iterator {
       public:
+        // stl compatibility
+
+        using value_type = ValueType;
+        using difference_type = std::ptrdiff_t;
+        using pointer = T *;
+        using reference = T &;
+        using iterator_category = std::bidirectional_iterator_tag;
+
         explicit Iterator(Chunk *chunk);
 
         Iterator(Chunk *chunk, size_t index);
