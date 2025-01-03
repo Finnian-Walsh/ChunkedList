@@ -12,18 +12,14 @@ set(SRC_FILES
         ../src/ChunkedListUtility.tpp
 )
 
-set(TEST_FILES core/TestUtility.cpp)
-
 include_directories(../include)
 
 add_executable(ChunkedListTest
         ${SRC_FILES}
-        ${TEST_FILES}
         ChunkedListTest.cpp
 )
 
 add_executable(StandardChunkedListTest
         ${SRC_FILES}
-        ${TEST_FILES}
         StandardChunkedListTest.cpp
 )
