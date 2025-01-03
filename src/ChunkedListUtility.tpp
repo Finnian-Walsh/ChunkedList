@@ -35,10 +35,10 @@ void SortFunctions::bubbleSort(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedLis
   do {
     sorted = true;
 
-    for (auto it = chunkedList.begin(); ++it != chunkedList.end(); ++it) {
-      if (compare(*++it, *it)) {
+    for (auto it = chunkedList.begin(); std::next(it) != chunkedList.end(); ++it) {
+      if (compare(*std::next(it), *it)) {
         sorted = false;
-        std::swap(*it, *++it);
+        std::swap(*it, *std::next(it));
       }
     }
   } while (!sorted);
@@ -53,10 +53,10 @@ void SortFunctions::selectionSort(ChunkedList<T, ChunkSize, ShouldCopy> &chunked
   auto startingIt = chunkedList.begin();
   const size_t range = chunkedList.size() - 1;
 
-  for (size_t i{}; i < range; ++i) {
+  for (size_t i = 0; i < range; ++i) {
     auto min = startingIt;
 
-    for (auto it = ++startingIt; it != chunkedList.end(); ++it) {
+    for (auto it = std::next(startingIt); it != chunkedList.end(); ++it) {
       if (compare(*it, *min)) {
         min = it;
       }
@@ -70,31 +70,32 @@ void SortFunctions::selectionSort(ChunkedList<T, ChunkSize, ShouldCopy> &chunked
   }
 }
 
-template<typename Compare, typename T, size_t ChunkSize, bool ShouldCopy>
-void SortFunctions::insertionSort(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList) {
-  if (1 >= chunkedList.size()) return;
+template <typename Compare, typename T, size_t ChunkSize, bool ShouldCopy>
+void SortFunctions::insertionSort(ChunkedList<T, ChunkSize, ShouldCopy>& chunkedList) {
+  if (chunkedList.size() <= 1) return;
+
+  using CaptureType = std::conditional_t<ShouldCopy, T, T&&>;
 
   Compare compare;
 
-  auto end = chunkedList.end();
+  auto begin = chunkedList.begin(), end = chunkedList.end();
 
-  for (auto startingIt = ++chunkedList.begin(); startingIt != end; ++startingIt) {
-    T value = ShouldCopy ? *startingIt : *++startingIt;
+  for (auto startingIt = std::next(begin); startingIt != end; ++startingIt) {
+    CaptureType value = *startingIt;
 
-    auto it = --startingIt;
+    auto it = startingIt;
 
-    while (it != chunkedList.begin()) {
-      if (compare(value, *it)) {
-        if constexpr (ShouldCopy) {
-          *++it = *it;
-        } else {
-          *++it = std::move(*it);
-        }
-      }
+    while (it != begin) {
+      auto prevIt = std::prev(it);
+
+      if (!compare(value, *prevIt)) break; // value < *prevIt
+
+      *it = std::move(*prevIt);
+      it = prevIt;
     }
-  }
 
-  // TODO: Finish Insertion Sort
+    *it = std::move(value);
+  }
 }
 
 template<typename Compare, typename T, size_t ChunkSize, bool ShouldCopy>
@@ -104,42 +105,42 @@ void SortFunctions::mergeSort(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList
   // TODO: Implement Merge Sort
 }
 
-
 template<typename Compare, typename T, size_t ChunkSize, bool ShouldCopy>
 void SortFunctions::quickSort(typename ChunkedList<T, ChunkSize, ShouldCopy>::Iterator start,
                               typename ChunkedList<T, ChunkSize, ShouldCopy>::Iterator end) {
-  if (start == end || start == --end) return;  // Base case: single element or empty range
+  if (start == end || std::next(start) == end) return;
 
   Compare compare;
 
   using Iterator = typename ChunkedList<T, ChunkSize, ShouldCopy>::Iterator;
 
-  Iterator itemFromLeft = start, itemFromRight = end;
+  Iterator pivot = end;
+  --pivot;
+
+  Iterator left = start;
+  Iterator right = pivot;
 
   while (true) {
-    while (compare(*itemFromLeft, *end)) {
-      ++itemFromLeft;
-      if (itemFromLeft == end) break;
+    while (left != pivot && compare(*left, *pivot)) {
+      ++left;
     }
 
-    while (compare(*end, *itemFromRight)) {
-      --itemFromRight;
-      if (itemFromRight == start) break;
+    while (right != start && compare(*pivot, *right)) {
+      --right;
     }
 
-    if (itemFromLeft == itemFromRight || itemFromLeft == end || itemFromRight == start) {
-      break;
-    }
+    if (left == right || std::next(right) == left) break;
 
-    std::swap(*itemFromLeft, *itemFromRight);
+    std::swap(*left, *right);
+    ++left;
+    --right;
   }
 
-  std::swap(*itemFromLeft, *end);
+  std::swap(*left, *pivot);
 
-  quickSort<Compare, T, ChunkSize, ShouldCopy>(start, itemFromLeft);
-  quickSort<Compare, T, ChunkSize, ShouldCopy>(++itemFromLeft, end);  // Start right partition after pivot
+  quickSort<Compare, T, ChunkSize, ShouldCopy>(start, left); // Left partition
+  quickSort<Compare, T, ChunkSize, ShouldCopy>(std::next(left), end); // Right partition
 }
-
 
 template<typename Compare, typename T, size_t ChunkSize, bool ShouldCopy>
 void SortFunctions::heapSort(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList) {
