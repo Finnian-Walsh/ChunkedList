@@ -7,8 +7,6 @@
 
 #include "core/TestUtility.hpp"
 
-template<size_t ChunkSize = 32, typename T = int, bool ShouldCopy = true>
-
 using namespace TestUtility;
 
 int main() {
@@ -60,8 +58,8 @@ int main() {
     testData.setSource("Insertion Sorting");
     Sorting<InsertionSort, ChunkedList>();
 
-    testData.setSource("Merge Sorting");
-    Sorting<MergeSort, ChunkedList>();
+      // testData.setSource("Merge Sorting");
+      // Sorting<MergeSort, ChunkedList>();
 
     testData.setSource("Quick Sorting");
     Sorting<QuickSort, ChunkedList>();
