@@ -2,9 +2,8 @@
 
 #include <algorithm>
 #include <queue>
-#include <StandardChunkedList.hpp>
 
-#include "ChunkedListUtility.hpp"
+#include "internal/ChunkedListUtility.hpp"
 
 using namespace ChunkedListUtility;
 

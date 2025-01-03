@@ -3,8 +3,8 @@
 #include <iostream>
 
 #include "ChunkedList.hpp"
-#include "ChunkedListMacros.hpp"
-#include "ChunkedListUtility.hpp"
+#include "internal/ChunkedListMacros.hpp"
+#include "internal/ChunkedListUtility.hpp"
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
 void ChunkedList<T, ChunkSize, ShouldCopy>::pushChunk(Chunk *chunk) {

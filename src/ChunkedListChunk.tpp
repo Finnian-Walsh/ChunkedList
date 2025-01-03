@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ChunkedListMacros.hpp"
+#include "internal/ChunkedListMacros.hpp"
 
 template<typename T, size_t ChunkSize, bool ShouldCopy>
 ChunkedList<T, ChunkSize, ShouldCopy>::Chunk::Chunk(Chunk *nextChunk, Chunk *prevChunk)

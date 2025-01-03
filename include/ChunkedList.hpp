@@ -1,14 +1,11 @@
 #pragma once
 
-#include <ChunkedListUtility.hpp>
 #include <sstream>
 #include <initializer_list>
 #include <cstring>
 #include <functional>
 
-#ifdef CHUNKED_LIST_DEBUGGING
-
-#endif
+#include "internal/ChunkedListUtility.hpp"
 
 template<typename T, size_t ChunkSize = 32, bool ShouldCopy = true>
 class ChunkedList {
