@@ -208,7 +208,7 @@ int main() {
     chunkedList.push_back(num);
   }
 
-  std::cout << "Unsorted: " << chunkddList << std::endl;
+  std::cout << "Unsorted: " << chunkedList << std::endl;
   
   chunkedList.sort<std::less<int>, HeapSort>();
   
