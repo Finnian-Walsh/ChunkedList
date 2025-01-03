@@ -1,34 +1,66 @@
+## Table of Contents
+1. [Concept](#concept)
+2. [Chunks](#chunks)
+3. [Deallocation](#deallocation)
+4. [Methods](#methods)
+    - [Iteration](#iteration)
+    - [Sorting](#sorting)
+    - [Private Member Accessing](#private-member-accessing)
+5. [Debugging](#debugging)
+6. [Installation](#installation)
+7. [Examples](#examples)
+    - [Basic Usage](#basic-usage)
+    - [String Concatenation](#string-concatenation)
+8. [Snake Case Variant](#snake-case-variant)
+
 # Chunked List
 
 ## Concept
 
-A simple C++ list data structure, which uses **Chunks** to store data.
+The **ChunkedList** is a simple and efficient C++ list data structure, which uses **Chunks** to store data.
 
 ```cpp
 template<typename T, size_t ChunkSize = 32, bool ShouldCopy = false>
 class ChunkedList;
 ```
 
-The **ChunkedList** data structure is essentially a linked list, where each node is a **Chunk**, as explained below.
+This data structure is essentially a linked list, where each node is a **Chunk**.
+
+### Template Parameters
+
+- `T` the type of data which will be stored in the **ChunkedList**
+- `ChunkSize` the size of each **Chunk**
+- `ShouldCopy` whether or not data in the **ChunkedList** should be copied when transferring data
 
 ## Chunks
 
-Each **Chunk** contains a fixed array, of size ChunkSize, and the **Chunk** class has 3 constructors, each populating
-the array in a different way. However,
-**Chunks** are abstracted away and from the user's view.
+Each **Chunk** contains a fixed array, of size ChunkSize. However, **Chunks** are abstracted away and from the user's view.
 
-Furthermore, each **Chunk** keeps track of its next index, incrementing and decrementing it by 1 each push and pop
+Furthermore, each **Chunk** keeps track of its next index, incrementing and decrementing it by 1 each push and pop,
 respectively.
 Therefore, calling the pop method on a **ChunkedList** doesn't deallocate anything unless the next index of the back
-**Chunk** is equal to 0, causing the entire Chunk and its contents to be deallocated. Although, you should make sure to
-be careful with this - using values which have been popped is recommended against.
+**Chunk** is equal to 0, causing the entire **Chunk** to be deallocated. Using popped values which haven't been deallocated is recommended against.
 
-## Iterating
+## Deallocation
 
-To iterate over a **ChunkedList**, **Iterators** (or **ChunkIterators**) should be used. Index based for-loops should
-not be used, since each subscript operation performs a linear search, iterating through each **Chunk** until the correct
-value is found. Additionally, range
-based for-loops are supported, which implicitly utilise **Iterators**.
+When a **ChunkedList** instance is deallocated, every **Chunk** gets deallocated, from the `back` to the `front`.
+
+```cpp
+template<typename T, size_t ChunkSize, bool ShouldCopy>
+ChunkedList<T, ChunkSize, ShouldCopy>::~ChunkedList() {
+  do {
+    Chunk *newBack = back->prevChunk;
+    delete back;
+    back = newBack;
+  } while (back);
+}
+```
+
+## Methods
+
+### Iteration
+
+To iterate over a **ChunkedList**, **Iterators** should be used - range-based for-loops are supported. Index based for-loops should not be used, since each subscript operation performs a O(n/k) search, iterating through each **Chunk** until the correct value is found.
 
 ```cpp
 for (T value : chunkedList) {
@@ -44,20 +76,52 @@ template<typename T, size_t ChunkSize, bool ShouldCopy>
 ChunkedList<T, ChunkSize, ShouldCopy>::Iterator end(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList);
 ```
 
+### Sorting
+
+The **ChunkedList** data structure comes with a built-in sort function, allowing you to sort it with a specified compare class and an algorithm of your choice with template parameters.
+
+```cpp
+template<typename Compare = std::less<T>, SortEnum SortType = HeapSort>
+void sort();
+```
+
+By default, the sort function uses `std::less<T>` to compare types and `HeapSort` as the Sorting algorithm
+
+### Private member accessing
+
+A **ChunkedListAccessor** class provides safe access to the private members:
+- front (first chunk)
+- back (last chunk)
+- chunkCount (number of chunks)
+
+```cpp
+template<typename T, size_t ChunkSize, bool ShouldCopy>
+class ChunkedListAccessor final : ChunkedList<T, ChunkSize, ShouldCopy>;
+```
+
+Usage:
+
+```cpp
+auto &accessor = static_cast<ChunkedListAccessor<T, ChunkSize, ShouldCopy>
+
+auto front = accessor.getFront();
+auto back = accessor.getBack();
+size_t chunkCount = accessor.getChunkCount();
+```
+
 ## Debugging
 
-If you wish to enable debugging mode for **ChunkedList** development, you can add
+Enable debugging mode by defining:
 
 ```cpp
 #define CHUNKED_LIST_DEBUGGING
 ```
 
-in `src/ChunkedList.hpp` or before you include the header file. Doing so will cause the **ChunkedList** operations to be
-outputted in the console.
+This will log **ChunkedList** operations to the console.
 
-## How to use
+## Installation
 
-Using this repository is simple. Either add the repository as a submodule or clone the repository.
+Clone the repository or add it as a submodule to your project.
 
 ```bash
 git submodule add https://github.com/Finnian-Walsh/ChunkedList.git <path>
@@ -67,56 +131,68 @@ git submodule add https://github.com/Finnian-Walsh/ChunkedList.git <path>
 git clone https://github.com/Finnian-Walsh/ChunkedList.git
 ```
 
-## Coding examples
+Then, add the `include` directory to your include directories.
+
+## Examples
+
+### Basic Usage
 
 ```cpp
-#include "ChunkedList.hpp"
-
 #include <iostream>
+
+#include "ChunkedList.hpp"
 
 int main() {
   ChunkedList<int> list{1, 2, 3, 4, 5};
   
-  for (int num : list)
+  for (int num: list)
     std::cout << num << '\n';    
     
   return 0;
 }
 ```
 
-Creates a **ChunkedList** of **int**s, populated with 1, 2, 3, 4, 5 then outputs each number in the console with a range
-based for-loop.
+Output:
+```
+1
+2
+3
+4
+5
+```
+
+### String Concatenation
 
 ```cpp
-#include "ChunkedList.hpp"
-
 #include <iostream>
 
+#include "ChunkedList.hpp"
+
 int main() {
-  ChunkedList<std::string> list{"hello", "world"};
+  ChunkedList<std::string> list{"Hello", "world!"};
   
-  std::cout << list.concat(" ");
+  std::cout << list.concat(" ") << std::endl;
 }
 ```
 
-Creates a **ChunkedList** populated with **std::string**s containing "hello" and "world" then joins each
-word in the list together with " ", subsequently outputting the returned **std::string**.
+Output:
+```
+Hello world!
+```
 
-## Naming Conventions
+## Snake Case Variant
 
-The **ChunkedList** data structure uses `camelCase`. However, if you would like to use the **ChunkedList** with
-`snake_case`, you can add
+For projects where `snake_case` naming conventions are used, include:
 
 ```cpp
 #include "StandardChunkedList.hpp"
 ```
 
-to your code instead. This gives you access to the **chunked_list** data structure, which has all the same
-methods of the **ChunkedList**, but written in snake case.
+This implements the **chunked_list** class, with identical functionality to the **ChunkedList**.
 
-### Standard Chunked List Examples
+### Example
 
-````cpp
+```cpp
 #include "StandardChunkedList.hpp"
 
 #include <random>
@@ -125,17 +201,19 @@ int main() {
   chunked_list<int, 32> chunkedList{};
   
   std::mt19937 gen{std::random_device{}};
-  std::uniform_int_distrubition<int> dist{1, 100};
+  std::uniform_int_distribution<int> dist{1, 100};
   
   for (int i = 0; i < 1000; ++i) {
     int num = dist(gen);
     chunkedList.push_back(num);
   }
+
+  std::cout << "Unsorted: " << chunkedList << std::endl;
   
-  chunkedList.sort<true>();
+  chunkedList.sort<std::less<int>, HeapSort>();
   
-  std::cout << chunkedList << std::endl;
+  std::cout << "Sorted: " << chunkedList << std::endl;
   
   return 0;
 }
-````
+```
