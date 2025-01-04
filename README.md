@@ -1,4 +1,5 @@
 ## Table of Contents
+
 1. [Concept](#concept)
 2. [Chunks](#chunks)
 3. [Deallocation](#deallocation)
@@ -20,7 +21,7 @@
 The **ChunkedList** is a simple and efficient C++ list data structure, which uses **Chunks** to store data.
 
 ```cpp
-template<typename T, size_t ChunkSize = 32, bool ShouldCopy = false>
+template<typename T, size_t ChunkSize = 32>
 class ChunkedList;
 ```
 
@@ -30,24 +31,25 @@ This data structure is essentially a linked list, where each node is a **Chunk**
 
 - `T` the type of data which will be stored in the **ChunkedList**
 - `ChunkSize` the size of each **Chunk**
-- `ShouldCopy` whether or not data in the **ChunkedList** should be copied when transferring data
 
 ## Chunks
 
-Each **Chunk** contains a fixed array, of size ChunkSize. However, **Chunks** are abstracted away and from the user's view.
+Each **Chunk** contains a fixed array, of size ChunkSize. However, **Chunks** are abstracted away and from the user's
+view.
 
 Furthermore, each **Chunk** keeps track of its next index, incrementing and decrementing it by 1 each push and pop,
 respectively.
 Therefore, calling the pop method on a **ChunkedList** doesn't deallocate anything unless the next index of the back
-**Chunk** is equal to 0, causing the entire **Chunk** to be deallocated. Using popped values which haven't been deallocated is recommended against.
+**Chunk** is equal to 0, causing the entire **Chunk** to be deallocated. Using popped values which haven't been
+deallocated is recommended against.
 
 ## Deallocation
 
 When a **ChunkedList** instance is deallocated, every **Chunk** gets deallocated, from the `back` to the `front`.
 
 ```cpp
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-ChunkedList<T, ChunkSize, ShouldCopy>::~ChunkedList() {
+template<typename T, size_t ChunkSize>
+ChunkedList<T, ChunkSize>::~ChunkedList() {
   do {
     Chunk *newBack = back->prevChunk;
     delete back;
@@ -60,7 +62,9 @@ ChunkedList<T, ChunkSize, ShouldCopy>::~ChunkedList() {
 
 ### Iteration
 
-To iterate over a **ChunkedList**, **Iterators** should be used - range-based for-loops are supported. Index based for-loops should not be used, since each subscript operation performs a O(n/k) search, iterating through each **Chunk** until the correct value is found.
+To iterate over a **ChunkedList**, **Iterators** should be used - range-based for-loops are supported. Index based
+for-loops should not be used, since each subscript operation performs a O(n/k) search, iterating through each **Chunk**
+until the correct value is found.
 
 ```cpp
 for (T value : chunkedList) {
@@ -69,16 +73,17 @@ for (T value : chunkedList) {
 ```
 
 ```cpp
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-ChunkedList<T, ChunkSize, ShouldCopy>::Iterator begin(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList);
+template<typename T, size_t ChunkSize>
+ChunkedList<T, ChunkSize>::Iterator begin(ChunkedList<T, ChunkSize> &chunkedList);
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-ChunkedList<T, ChunkSize, ShouldCopy>::Iterator end(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList);
+template<typename T, size_t ChunkSize>
+ChunkedList<T, ChunkSize>::Iterator end(ChunkedList<T, ChunkSize> &chunkedList);
 ```
 
 ### Sorting
 
-The **ChunkedList** data structure comes with a built-in sort function, allowing you to sort it with a specified compare class and an algorithm of your choice with template parameters.
+The **ChunkedList** data structure comes with a built-in sort function, allowing you to sort it with a specified compare
+class and an algorithm of your choice with template parameters.
 
 ```cpp
 template<typename Compare = std::less<T>, SortEnum SortType = HeapSort>
@@ -90,19 +95,20 @@ By default, the sort function uses `std::less<T>` to compare types and `HeapSort
 ### Private member accessing
 
 A **ChunkedListAccessor** class provides safe access to the private members:
+
 - front (first chunk)
 - back (last chunk)
 - chunkCount (number of chunks)
 
 ```cpp
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-class ChunkedListAccessor final : ChunkedList<T, ChunkSize, ShouldCopy>;
+template<typename T, size_t ChunkSize>
+class ChunkedListAccessor final : ChunkedList<T, ChunkSize>;
 ```
 
 Usage:
 
 ```cpp
-auto &accessor = static_cast<ChunkedListAccessor<T, ChunkSize, ShouldCopy>
+auto &accessor = static_cast<ChunkedListAccessor<T, ChunkSize>
 
 auto front = accessor.getFront();
 auto back = accessor.getBack();
@@ -153,6 +159,7 @@ int main() {
 ```
 
 Output:
+
 ```
 1
 2
@@ -176,6 +183,7 @@ int main() {
 ```
 
 Output:
+
 ```
 Hello world!
 ```

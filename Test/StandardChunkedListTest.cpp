@@ -131,6 +131,6 @@ int main() {
     testData.setSource("Test 5");
     ConcatenationAndIndexing<chunked_list, 5>();
   });
-  
+
   SUCCESS
 }

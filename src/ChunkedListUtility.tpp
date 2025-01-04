@@ -10,8 +10,8 @@ using namespace ChunkedListUtility;
 /**
  * @brief Calls the given sort function on the chunked list
  */
-template<typename Compare, SortType Sort = QuickSort, typename T, size_t ChunkSize, bool ShouldCopy>
-void ChunkedListUtility::sort(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList) {
+template<typename Compare, SortType Sort = QuickSort, typename T, size_t ChunkSize>
+void ChunkedListUtility::sort(ChunkedList<T, ChunkSize> &chunkedList) {
   using namespace SortFunctions;
 
   switch (Sort) {
@@ -19,13 +19,13 @@ void ChunkedListUtility::sort(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList
     case SelectionSort: return selectionSort<Compare>(chunkedList);
     case InsertionSort: return insertionSort<Compare>(chunkedList);
     case MergeSort: return mergeSort<Compare>(chunkedList);
-    case QuickSort: return quickSort<Compare, T, ChunkSize, ShouldCopy>(chunkedList.begin(), chunkedList.end());
+    case QuickSort: return quickSort<Compare, T, ChunkSize>(chunkedList.begin(), chunkedList.end());
     case HeapSort: return heapSort<Compare>(chunkedList);
   }
 }
 
-template<typename Compare, typename T, size_t ChunkSize, bool ShouldCopy>
-void SortFunctions::bubbleSort(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList) {
+template<typename Compare, typename T, size_t ChunkSize>
+void SortFunctions::bubbleSort(ChunkedList<T, ChunkSize> &chunkedList) {
   if (1 >= chunkedList.size()) return;
 
   Compare compare;
@@ -44,8 +44,8 @@ void SortFunctions::bubbleSort(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedLis
   } while (!sorted);
 }
 
-template<typename Compare, typename T, size_t ChunkSize, bool ShouldCopy>
-void SortFunctions::selectionSort(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList) {
+template<typename Compare, typename T, size_t ChunkSize>
+void SortFunctions::selectionSort(ChunkedList<T, ChunkSize> &chunkedList) {
   if (1 >= chunkedList.size()) return;
 
   Compare compare;
@@ -70,18 +70,16 @@ void SortFunctions::selectionSort(ChunkedList<T, ChunkSize, ShouldCopy> &chunked
   }
 }
 
-template <typename Compare, typename T, size_t ChunkSize, bool ShouldCopy>
-void SortFunctions::insertionSort(ChunkedList<T, ChunkSize, ShouldCopy>& chunkedList) {
+template <typename Compare, typename T, size_t ChunkSize>
+void SortFunctions::insertionSort(ChunkedList<T, ChunkSize>& chunkedList) {
   if (chunkedList.size() <= 1) return;
-
-  using CaptureType = std::conditional_t<ShouldCopy, T, T&&>;
 
   Compare compare;
 
   auto begin = chunkedList.begin(), end = chunkedList.end();
 
   for (auto startingIt = std::next(begin); startingIt != end; ++startingIt) {
-    CaptureType value = *startingIt;
+    T value = *startingIt;
 
     auto it = startingIt;
 
@@ -98,21 +96,21 @@ void SortFunctions::insertionSort(ChunkedList<T, ChunkSize, ShouldCopy>& chunked
   }
 }
 
-template<typename Compare, typename T, size_t ChunkSize, bool ShouldCopy>
-void SortFunctions::mergeSort(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList) {
+template<typename Compare, typename T, size_t ChunkSize>
+void SortFunctions::mergeSort(ChunkedList<T, ChunkSize> &chunkedList) {
   if (1 >= chunkedList.size()) return;
 
   // TODO: Implement Merge Sort
 }
 
-template<typename Compare, typename T, size_t ChunkSize, bool ShouldCopy>
-void SortFunctions::quickSort(typename ChunkedList<T, ChunkSize, ShouldCopy>::Iterator start,
-                              typename ChunkedList<T, ChunkSize, ShouldCopy>::Iterator end) {
+template<typename Compare, typename T, size_t ChunkSize>
+void SortFunctions::quickSort(typename ChunkedList<T, ChunkSize>::Iterator start,
+                              typename ChunkedList<T, ChunkSize>::Iterator end) {
   if (start == end || std::next(start) == end) return;
 
   Compare compare;
 
-  using Iterator = typename ChunkedList<T, ChunkSize, ShouldCopy>::Iterator;
+  using Iterator = typename ChunkedList<T, ChunkSize>::Iterator;
 
   Iterator pivot = end;
   --pivot;
@@ -138,12 +136,12 @@ void SortFunctions::quickSort(typename ChunkedList<T, ChunkSize, ShouldCopy>::It
 
   std::swap(*left, *pivot);
 
-  quickSort<Compare, T, ChunkSize, ShouldCopy>(start, left); // Left partition
-  quickSort<Compare, T, ChunkSize, ShouldCopy>(std::next(left), end); // Right partition
+  quickSort<Compare, T, ChunkSize>(start, left); // Left partition
+  quickSort<Compare, T, ChunkSize>(std::next(left), end); // Right partition
 }
 
-template<typename Compare, typename T, size_t ChunkSize, bool ShouldCopy>
-void SortFunctions::heapSort(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList) {
+template<typename Compare, typename T, size_t ChunkSize>
+void SortFunctions::heapSort(ChunkedList<T, ChunkSize> &chunkedList) {
   if (1 >= chunkedList.size()) return;
 
   std::priority_queue<T, std::vector<T>, Compare> heap{};

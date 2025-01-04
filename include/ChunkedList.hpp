@@ -7,7 +7,7 @@
 
 #include "internal/ChunkedListUtility.hpp"
 
-template<typename T, size_t ChunkSize = 32, bool ShouldCopy = true>
+template<typename T, size_t ChunkSize = 32>
 class ChunkedList {
   protected:
     static_assert(ChunkSize > 0, "Chunk Size must be greater than 0");
@@ -25,7 +25,7 @@ class ChunkedList {
         /**
          * @brief creates a chunk with an initializer list - does not check for overflows
          **/
-        Chunk(const std::initializer_list<T> &initializerList);
+        Chunk(std::initializer_list<T> initializerList);
 
         Chunk() = default;
 
@@ -59,11 +59,9 @@ class ChunkedList {
     void pushChunk(Chunk *chunk);
 
   public:
-    using ValueType = std::conditional_t<ShouldCopy, T, const T &>;
-
     ChunkedList();
 
-    ChunkedList(const std::initializer_list<T> &initializerList);
+    ChunkedList(std::initializer_list<T> initializerList);
 
     ~ChunkedList();
 
@@ -148,7 +146,7 @@ class ChunkedList {
       public:
         // stl compatibility
 
-        using value_type = ValueType;
+        using value_type = T;
         using difference_type = std::ptrdiff_t;
         using pointer = T *;
         using reference = T &;
@@ -258,7 +256,10 @@ class ChunkedList {
 
     ChunkIterator endChunk();
 
-    void push(ValueType value);
+    void push(T value);
+
+    template<typename... Args>
+    void emplace(Args &&... args);
 
     void pop();
 
@@ -287,21 +288,21 @@ class ChunkedList {
     StringType concat(SeparatorType delimiter = ", ");
 };
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-typename ChunkedList<T, ChunkSize, ShouldCopy>::ConstIterator
-begin(const ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList) noexcept;
+template<typename T, size_t ChunkSize>
+typename ChunkedList<T, ChunkSize>::ConstIterator
+begin(const ChunkedList<T, ChunkSize> &chunkedList) noexcept;
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-typename ChunkedList<T, ChunkSize, ShouldCopy>::Iterator
-begin(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList) noexcept;
+template<typename T, size_t ChunkSize>
+typename ChunkedList<T, ChunkSize>::Iterator
+begin(ChunkedList<T, ChunkSize> &chunkedList) noexcept;
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-typename ChunkedList<T, ChunkSize, ShouldCopy>::ConstIterator
-end(const ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList) noexcept;
+template<typename T, size_t ChunkSize>
+typename ChunkedList<T, ChunkSize>::ConstIterator
+end(const ChunkedList<T, ChunkSize> &chunkedList) noexcept;
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-typename ChunkedList<T, ChunkSize, ShouldCopy>::Iterator
-end(ChunkedList<T, ChunkSize, ShouldCopy> &chunkedList) noexcept;
+template<typename T, size_t ChunkSize>
+typename ChunkedList<T, ChunkSize>::Iterator
+end(ChunkedList<T, ChunkSize> &chunkedList) noexcept;
 
 #undef DEBUG_LOG
 #undef DEBUG_LINE

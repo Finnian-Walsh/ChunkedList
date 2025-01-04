@@ -4,9 +4,9 @@
 
 #include "ChunkedList.hpp"
 
-template<typename T, size_t ChunkSize = 32, bool ShouldCopy = true>
-class chunked_list final : ChunkedList<T, ChunkSize, ShouldCopy> {
-  using derived_chunked_list = ChunkedList<T, ChunkSize, ShouldCopy>;
+template<typename T, size_t ChunkSize = 32>
+class chunked_list final : ChunkedList<T, ChunkSize> {
+  using derived_chunked_list = ChunkedList<T, ChunkSize>;
 
   public:
     using value_type = typename derived_chunked_list::ValueType;

@@ -91,12 +91,12 @@ inline void TestUtility::performTask(const char *taskName, const int logLevel) {
   }
 }
 
-template<template <typename, size_t, bool> typename ChunkedListType, size_t ChunkSize>
+template<template <typename, size_t> typename ChunkedListType, size_t ChunkSize>
 void Tests::FrontAndBack() {
   performTask("Creating chunked list with initializer list");
 
-  using ListType = ChunkedListType<DefaultT, ChunkSize, DefaultShouldCopy>;
-  using AccessorType = ChunkedListAccessor<DefaultT, ChunkSize, DefaultShouldCopy>;
+  using ListType = ChunkedListType<DefaultT, ChunkSize>;
+  using AccessorType = ChunkedListAccessor<DefaultT, ChunkSize>;
 
   ListType chunkedList{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 
@@ -115,9 +115,9 @@ void Tests::FrontAndBack() {
   THROW_IF(chunkedList[size - 1] != 10, "Last item is not 10")
 }
 
-template<template <typename, size_t, bool> typename ChunkedListType, size_t ChunkSize>
+template<template <typename, size_t> typename ChunkedListType, size_t ChunkSize>
 void Tests::Insertion() {
-  using ListType = ChunkedListType<DefaultT, ChunkSize, DefaultShouldCopy>;
+  using ListType = ChunkedListType<DefaultT, ChunkSize>;
 
   ListType chunkedList{5, 10, 15};
   std::string expectedOutput{"[5, 10, 15"};
@@ -141,10 +141,10 @@ void Tests::Insertion() {
            std::string("ostream insertion ran incorrectly\nGot: ") += os.str())
 }
 
-template<SortType SortingAlgorithm, template<typename, size_t, bool> typename ChunkedListType>
+template<SortType SortingAlgorithm, template<typename, size_t> typename ChunkedListType>
 void Tests::Sorting() {
   performTask("List creation");
-  ChunkedListType<DefaultT, DefaultChunkSize, DefaultShouldCopy> list;
+  ChunkedListType<DefaultT, DefaultChunkSize> list;
 
   performTask("Random Number Generator creation");
   RandomNumberGenerator rng;
@@ -180,9 +180,9 @@ void Tests::Sorting() {
   }
 }
 
-template<template <typename, size_t, bool> typename ChunkedListType, size_t ChunkSize>
+template<template <typename, size_t> typename ChunkedListType, size_t ChunkSize>
 void Tests::PushingAndPopping() {
-  using ListType = ChunkedListType<DefaultT, ChunkSize, DefaultShouldCopy>;
+  using ListType = ChunkedListType<DefaultT, ChunkSize>;
   ListType chunkedList{};
 
   performTask("Pushing");
@@ -206,9 +206,9 @@ void Tests::PushingAndPopping() {
   THROW_IF(firstItem != 'a', "First item is not 'a'")
 }
 
-template<template <typename, size_t, bool> typename ChunkedListType, size_t ChunkSize>
+template<template <typename, size_t> typename ChunkedListType, size_t ChunkSize>
 void Tests::Iterators() {
-  using ListType = ChunkedListType<DefaultT, ChunkSize, DefaultShouldCopy>;
+  using ListType = ChunkedListType<DefaultT, ChunkSize>;
 
   performTask("List creation");
   ListType chunkedList{1, 2, 3, 4, 5};
@@ -221,9 +221,9 @@ void Tests::Iterators() {
   THROW_IF(total != 15, "List sum is not 15")
 }
 
-template<template <typename, size_t, bool> typename ChunkedListType, size_t ChunkSize>
+template<template <typename, size_t> typename ChunkedListType, size_t ChunkSize>
 void Tests::ConcatenationAndIndexing() {
-  using ListType = ChunkedListType<DefaultT, ChunkSize, DefaultShouldCopy>;
+  using ListType = ChunkedListType<DefaultT, ChunkSize>;
   ListType chunkedList;
 
   performTask("Pushing");
@@ -244,9 +244,9 @@ void Tests::ConcatenationAndIndexing() {
   }
 }
 
-template<template <typename, size_t, bool> typename ChunkedListType, size_t ChunkSize>
+template<template <typename, size_t> typename ChunkedListType, size_t ChunkSize>
 void Tests::EqualityAndInequality() {
-  using ListType = ChunkedListType<DefaultT, ChunkSize, DefaultShouldCopy>;
+  using ListType = ChunkedListType<DefaultT, ChunkSize>;
 
   ListType list1{};
   ListType list2{};

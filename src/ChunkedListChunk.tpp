@@ -2,106 +2,93 @@
 
 #include "internal/ChunkedListMacros.hpp"
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-ChunkedList<T, ChunkSize, ShouldCopy>::Chunk::Chunk(Chunk *nextChunk, Chunk *prevChunk)
+template<typename T, size_t ChunkSize>
+ChunkedList<T, ChunkSize>::Chunk::Chunk(Chunk *nextChunk, Chunk *prevChunk)
   : nextChunk(nextChunk), prevChunk(prevChunk) {
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-ChunkedList<T, ChunkSize, ShouldCopy>::Chunk::Chunk(const T *array, size_t size, Chunk *nextChunk,
-                                                    Chunk *prevChunk) : nextIndex(size),
-                                                                        nextChunk(nextChunk),
-                                                                        prevChunk(prevChunk) {
-  DEBUG_LOG("range = " << size << " (")
-
-#ifdef CHUNKED_LIST_DEBUGGING
-  int index = 0;
-  for (; index < size - 1; ++index) {
-    DEBUG_LOG(array[index] << ", ")
-    if constexpr (ShouldCopy) data[index] = array[index];
-    else data[index] = std::move(array[index]);
-  }
-
-  if constexpr (ShouldCopy) data[index] = array[index];
-  else data[index] = std::move(array[index]);
-
-  DEBUG_LOG(data[index] << ')')
-  DEBUG_LINE(true)
-#else
+template<typename T, size_t ChunkSize>
+ChunkedList<T, ChunkSize>::Chunk::Chunk(const T *array, const size_t size, Chunk *nextChunk,
+                                        Chunk *prevChunk) : nextIndex(size),
+                                                            nextChunk(nextChunk),
+                                                            prevChunk(prevChunk) {
+  DEBUG_LOG("range = " << size << ": ")
   for (int index = 0; index < size; ++index) {
-    if constexpr (ShouldCopy) data[index] = array[index];
-    else data[index] = std::move(array[index]);
+    data[index] = array[index];
+    DEBUG_LOG(array[index] << ", ")
   }
-#endif
+
+  DEBUG_LINE(true)
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-ChunkedList<T, ChunkSize, ShouldCopy>::Chunk::Chunk(const std::initializer_list<T> &initializerList) : nextIndex(
+template<typename T, size_t ChunkSize>
+ChunkedList<T, ChunkSize>::Chunk::Chunk(std::initializer_list<T> initializerList) : nextIndex(
   initializerList.size()) {
   for (int index = 0; index < initializerList.size(); ++index) {
     DEBUG_LOG(initializerList.begin()[index] << ' ')
-    if constexpr (ShouldCopy)
-      data[index] = initializerList.begin()[index];
-    else
-      data[index] = std::move(initializerList.begin()[index]);
+    data[index] = initializerList.begin()[index];
   }
 
   DEBUG_LINE(true)
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-typename ChunkedList<T, ChunkSize, ShouldCopy>::Chunk &
-ChunkedList<T, ChunkSize, ShouldCopy>::Chunk::operator+(const size_t offset) {
+/**
+ * @brief returns the chunk x chunks ahead of the given chunk. Does not account for overflows
+ */
+template<typename T, size_t ChunkSize>
+typename ChunkedList<T, ChunkSize>::Chunk &
+ChunkedList<T, ChunkSize>::Chunk::operator+(const size_t offset) {
   Chunk *chunk{this};
 
-  for (size_t i{0}; i < offset; ++i)
+  for (size_t i = 0; i < offset; ++i)
     chunk = chunk->nextChunk;
 
   return *chunk;
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-typename ChunkedList<T, ChunkSize, ShouldCopy>::Chunk &
-ChunkedList<T, ChunkSize, ShouldCopy>::Chunk::operator-(const size_t offset) {
+/**
+ * @brief returns the chunk x chunks behind the given chunk. Does not account for overflows
+ */
+template<typename T, size_t ChunkSize>
+typename ChunkedList<T, ChunkSize>::Chunk &
+ChunkedList<T, ChunkSize>::Chunk::operator-(const size_t offset) {
   Chunk *chunk{this};
 
-  for (size_t i{0}; i < offset; ++i)
+  for (size_t i = 0; i < offset; ++i)
     chunk = chunk->nextChunk;
 
   return *chunk;
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-bool ChunkedList<T, ChunkSize, ShouldCopy>::Chunk::empty() const {
+template<typename T, size_t ChunkSize>
+bool ChunkedList<T, ChunkSize>::Chunk::empty() const {
   return nextIndex == 0;
 }
 
-
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-T &ChunkedList<T, ChunkSize, ShouldCopy>::Chunk::operator[](size_t index) {
+template<typename T, size_t ChunkSize>
+T &ChunkedList<T, ChunkSize>::Chunk::operator[](size_t index) {
   return data[index];
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-const T &ChunkedList<T, ChunkSize, ShouldCopy>::Chunk::operator[](size_t index) const {
+template<typename T, size_t ChunkSize>
+const T &ChunkedList<T, ChunkSize>::Chunk::operator[](size_t index) const {
   return data[index];
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-bool ChunkedList<T, ChunkSize, ShouldCopy>::Chunk::operator==(const Chunk &other) const {
+template<typename T, size_t ChunkSize>
+bool ChunkedList<T, ChunkSize>::Chunk::operator==(const Chunk &other) const {
   return this == &other;
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-bool ChunkedList<T, ChunkSize, ShouldCopy>::Chunk::operator!=(const Chunk &other) const {
+template<typename T, size_t ChunkSize>
+bool ChunkedList<T, ChunkSize>::Chunk::operator!=(const Chunk &other) const {
   return this == &other;
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-void ChunkedList<T, ChunkSize, ShouldCopy>::Chunk::debugData(std::string &str) const {
+template<typename T, size_t ChunkSize>
+void ChunkedList<T, ChunkSize>::Chunk::debugData(std::string &str) const {
   std::ostringstream oss{};
-  oss << "ChunkedList<" << typeid(T).name() << ", " << static_cast<char>(ChunkSize + '0') << ", " << (
-    ShouldCopy ? "true" : "false") << ">::Chunk(nextIndex=" << nextIndex << ", nextChunk=" << nextChunk <<
+  oss << "ChunkedList<" << typeid(T).name() << ", " << std::to_string(ChunkSize) << ">::Chunk(nextIndex=" << nextIndex << ", nextChunk=" << nextChunk <<
   ", prevChunk = " << prevChunk;
 
   if (empty()) {
@@ -109,7 +96,7 @@ void ChunkedList<T, ChunkSize, ShouldCopy>::Chunk::debugData(std::string &str) c
   } {
     oss << ", data=[";
 
-    size_t index{0};
+    size_t index = 0;
 
     for (; index < nextIndex - 1; ++index) {
       oss << data[index] << ", ";

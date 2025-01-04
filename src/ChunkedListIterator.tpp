@@ -11,37 +11,36 @@
 
 */
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-ChunkedList<T, ChunkSize, ShouldCopy>::Iterator::Iterator(Chunk *chunk) : chunkIterator(chunk) {
+template<typename T, size_t ChunkSize>
+ChunkedList<T, ChunkSize>::Iterator::Iterator(Chunk *chunk) : chunkIterator(chunk) {
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-ChunkedList<T, ChunkSize, ShouldCopy>::Iterator::Iterator(Chunk *chunk, const size_t index) : chunkIterator(chunk),
+template<typename T, size_t ChunkSize>
+ChunkedList<T, ChunkSize>::Iterator::Iterator(Chunk *chunk, const size_t index) : chunkIterator(chunk),
   index(index) {
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-ChunkedList<T, ChunkSize, ShouldCopy>::Iterator::Iterator(Chunk &chunk) : chunkIterator(&chunk) {
+template<typename T, size_t ChunkSize>
+ChunkedList<T, ChunkSize>::Iterator::Iterator(Chunk &chunk) : chunkIterator(&chunk) {
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-ChunkedList<T, ChunkSize, ShouldCopy>::Iterator::Iterator(Chunk &chunk, const size_t index) : chunkIterator(&chunk),
+template<typename T, size_t ChunkSize>
+ChunkedList<T, ChunkSize>::Iterator::Iterator(Chunk &chunk, const size_t index) : chunkIterator(&chunk),
   index(index) {
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-ChunkedList<T, ChunkSize, ShouldCopy>::Iterator::Iterator(ChunkIterator chunkIterator) : chunkIterator{chunkIterator} {
+template<typename T, size_t ChunkSize>
+ChunkedList<T, ChunkSize>::Iterator::Iterator(ChunkIterator chunkIterator) : chunkIterator{chunkIterator} {
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-ChunkedList<T, ChunkSize,
-  ShouldCopy>::Iterator::Iterator(ChunkIterator chunkIterator, const size_t index) : chunkIterator{
+template<typename T, size_t ChunkSize>
+ChunkedList<T, ChunkSize>::Iterator::Iterator(ChunkIterator chunkIterator, const size_t index) : chunkIterator{
   chunkIterator
 }, index(index) {
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-typename ChunkedList<T, ChunkSize, ShouldCopy>::Iterator ChunkedList<T, ChunkSize, ShouldCopy>::Iterator::operator++() {
+template<typename T, size_t ChunkSize>
+typename ChunkedList<T, ChunkSize>::Iterator ChunkedList<T, ChunkSize>::Iterator::operator++() {
   if (index < ChunkSize - 1) {
     ++index;
   } else if (chunkIterator->nextChunk) {
@@ -54,16 +53,16 @@ typename ChunkedList<T, ChunkSize, ShouldCopy>::Iterator ChunkedList<T, ChunkSiz
   return *this;
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-typename ChunkedList<T, ChunkSize, ShouldCopy>::Iterator ChunkedList<T, ChunkSize, ShouldCopy>::Iterator::operator
+template<typename T, size_t ChunkSize>
+typename ChunkedList<T, ChunkSize>::Iterator ChunkedList<T, ChunkSize>::Iterator::operator
 ++(int) {
   Iterator original = *this;
   operator++();
   return original;
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-typename ChunkedList<T, ChunkSize, ShouldCopy>::Iterator ChunkedList<T, ChunkSize, ShouldCopy>::Iterator::operator--() {
+template<typename T, size_t ChunkSize>
+typename ChunkedList<T, ChunkSize>::Iterator ChunkedList<T, ChunkSize>::Iterator::operator--() {
   if (index == 0) {
     index = ChunkSize - 1;
     --chunkIterator;
@@ -74,17 +73,17 @@ typename ChunkedList<T, ChunkSize, ShouldCopy>::Iterator ChunkedList<T, ChunkSiz
   return *this;
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-typename ChunkedList<T, ChunkSize, ShouldCopy>::Iterator ChunkedList<T, ChunkSize, ShouldCopy>::Iterator::operator
+template<typename T, size_t ChunkSize>
+typename ChunkedList<T, ChunkSize>::Iterator ChunkedList<T, ChunkSize>::Iterator::operator
 --(int) {
   Iterator original = *this;
   operator--();
   return original;
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-typename ChunkedList<T, ChunkSize, ShouldCopy>::Iterator
-ChunkedList<T, ChunkSize, ShouldCopy>::Iterator::operator+(size_t offset) {
+template<typename T, size_t ChunkSize>
+typename ChunkedList<T, ChunkSize>::Iterator
+ChunkedList<T, ChunkSize>::Iterator::operator+(size_t offset) {
   size_t chunkOffset = offset / ChunkSize;
   offset %= ChunkSize;
 
@@ -98,9 +97,9 @@ ChunkedList<T, ChunkSize, ShouldCopy>::Iterator::operator+(size_t offset) {
   return Iterator{&(*chunkIterator + chunkOffset), iteratorIndex};
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-typename ChunkedList<T, ChunkSize, ShouldCopy>::Iterator
-ChunkedList<T, ChunkSize, ShouldCopy>::Iterator::operator-(size_t offset) {
+template<typename T, size_t ChunkSize>
+typename ChunkedList<T, ChunkSize>::Iterator
+ChunkedList<T, ChunkSize>::Iterator::operator-(size_t offset) {
   ChunkIterator newChunkIt = chunkIterator;
 
   while (offset > ChunkSize) {
@@ -118,55 +117,55 @@ ChunkedList<T, ChunkSize, ShouldCopy>::Iterator::operator-(size_t offset) {
   }
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-typename ChunkedList<T, ChunkSize, ShouldCopy>::Iterator
-ChunkedList<T, ChunkSize, ShouldCopy>::Iterator::operator+=(size_t offset) {
+template<typename T, size_t ChunkSize>
+typename ChunkedList<T, ChunkSize>::Iterator
+ChunkedList<T, ChunkSize>::Iterator::operator+=(size_t offset) {
   return *this = operator+(offset);
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-typename ChunkedList<T, ChunkSize, ShouldCopy>::Iterator
-ChunkedList<T, ChunkSize, ShouldCopy>::Iterator::operator-=(size_t offset) {
+template<typename T, size_t ChunkSize>
+typename ChunkedList<T, ChunkSize>::Iterator
+ChunkedList<T, ChunkSize>::Iterator::operator-=(size_t offset) {
   return *this = operator-(offset);
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-T &ChunkedList<T, ChunkSize, ShouldCopy>::Iterator::operator*() {
+template<typename T, size_t ChunkSize>
+T &ChunkedList<T, ChunkSize>::Iterator::operator*() {
   return chunkIterator[index];
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-T *ChunkedList<T, ChunkSize, ShouldCopy>::Iterator::operator->() {
+template<typename T, size_t ChunkSize>
+T *ChunkedList<T, ChunkSize>::Iterator::operator->() {
   return &chunkIterator[index];
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-const T &ChunkedList<T, ChunkSize, ShouldCopy>::Iterator::operator*() const {
+template<typename T, size_t ChunkSize>
+const T &ChunkedList<T, ChunkSize>::Iterator::operator*() const {
   return chunkIterator[index];
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-const T *ChunkedList<T, ChunkSize, ShouldCopy>::Iterator::operator->() const {
+template<typename T, size_t ChunkSize>
+const T *ChunkedList<T, ChunkSize>::Iterator::operator->() const {
   return &chunkIterator[index];
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-bool ChunkedList<T, ChunkSize, ShouldCopy>::Iterator::operator==(const Iterator other) const {
+template<typename T, size_t ChunkSize>
+bool ChunkedList<T, ChunkSize>::Iterator::operator==(const Iterator other) const {
   return other.chunkIterator == chunkIterator && other.index == index;
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-bool ChunkedList<T, ChunkSize, ShouldCopy>::Iterator::operator==(const ConstIterator other) const {
+template<typename T, size_t ChunkSize>
+bool ChunkedList<T, ChunkSize>::Iterator::operator==(const ConstIterator other) const {
   return other.chunkIterator == chunkIterator && other.index == index;
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-bool ChunkedList<T, ChunkSize, ShouldCopy>::Iterator::operator!=(const Iterator other) const {
+template<typename T, size_t ChunkSize>
+bool ChunkedList<T, ChunkSize>::Iterator::operator!=(const Iterator other) const {
   return other.chunkIterator != chunkIterator || other.index != index;
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-bool ChunkedList<T, ChunkSize, ShouldCopy>::Iterator::operator!=(const ConstIterator other) const {
+template<typename T, size_t ChunkSize>
+bool ChunkedList<T, ChunkSize>::Iterator::operator!=(const ConstIterator other) const {
   return reinterpret_cast<const Iterator *>(&other)->chunkIterator != chunkIterator || reinterpret_cast<const Iterator
            *>(&other)->index != index;
 }
@@ -182,56 +181,56 @@ bool ChunkedList<T, ChunkSize, ShouldCopy>::Iterator::operator!=(const ConstIter
 
  */
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-ChunkedList<T, ChunkSize, ShouldCopy>::ConstIterator::ConstIterator(const Chunk *chunk)
+template<typename T, size_t ChunkSize>
+ChunkedList<T, ChunkSize>::ConstIterator::ConstIterator(const Chunk *chunk)
   : Iterator{const_cast<Chunk *>(chunk)} {
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-ChunkedList<T, ChunkSize, ShouldCopy>::ConstIterator::ConstIterator(const Chunk *chunk, const size_t index)
+template<typename T, size_t ChunkSize>
+ChunkedList<T, ChunkSize>::ConstIterator::ConstIterator(const Chunk *chunk, const size_t index)
   : Iterator{const_cast<Chunk *>(chunk), index} {
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-ChunkedList<T, ChunkSize, ShouldCopy>::ConstIterator::ConstIterator(const Chunk &chunk)
+template<typename T, size_t ChunkSize>
+ChunkedList<T, ChunkSize>::ConstIterator::ConstIterator(const Chunk &chunk)
   : Iterator{const_cast<Chunk &>(chunk)} {
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-ChunkedList<T, ChunkSize, ShouldCopy>::ConstIterator::ConstIterator(const Chunk &chunk, const size_t index)
+template<typename T, size_t ChunkSize>
+ChunkedList<T, ChunkSize>::ConstIterator::ConstIterator(const Chunk &chunk, const size_t index)
   : Iterator{const_cast<Chunk &>(chunk), index} {
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-ChunkedList<T, ChunkSize, ShouldCopy>::ConstIterator::ConstIterator(const ChunkIterator chunkIterator)
+template<typename T, size_t ChunkSize>
+ChunkedList<T, ChunkSize>::ConstIterator::ConstIterator(const ChunkIterator chunkIterator)
   : Iterator{chunkIterator} {
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-ChunkedList<T, ChunkSize, ShouldCopy>::ConstIterator::ConstIterator(ChunkIterator chunkIterator, const size_t index)
+template<typename T, size_t ChunkSize>
+ChunkedList<T, ChunkSize>::ConstIterator::ConstIterator(ChunkIterator chunkIterator, const size_t index)
   : Iterator{chunkIterator, index} {
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-typename ChunkedList<T, ChunkSize, ShouldCopy>::ConstIterator
-ChunkedList<T, ChunkSize, ShouldCopy>::ConstIterator::operator+(size_t offset) const {
+template<typename T, size_t ChunkSize>
+typename ChunkedList<T, ChunkSize>::ConstIterator
+ChunkedList<T, ChunkSize>::ConstIterator::operator+(size_t offset) const {
   return Iterator::operator+(offset);
 }
 
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-typename ChunkedList<T, ChunkSize, ShouldCopy>::ConstIterator
-ChunkedList<T, ChunkSize, ShouldCopy>::ConstIterator::operator-(size_t offset) const {
+template<typename T, size_t ChunkSize>
+typename ChunkedList<T, ChunkSize>::ConstIterator
+ChunkedList<T, ChunkSize>::ConstIterator::operator-(size_t offset) const {
   return Iterator::operator-(offset);
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-const T &ChunkedList<T, ChunkSize, ShouldCopy>::ConstIterator::operator*() const {
+template<typename T, size_t ChunkSize>
+const T &ChunkedList<T, ChunkSize>::ConstIterator::operator*() const {
   return Iterator::operator*();
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-const T *ChunkedList<T, ChunkSize, ShouldCopy>::ConstIterator::operator->() const {
+template<typename T, size_t ChunkSize>
+const T *ChunkedList<T, ChunkSize>::ConstIterator::operator->() const {
   return Iterator::operator->();
 }
 
@@ -247,43 +246,43 @@ const T *ChunkedList<T, ChunkSize, ShouldCopy>::ConstIterator::operator->() cons
 
 */
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-ChunkedList<T, ChunkSize, ShouldCopy>::ChunkIterator::ChunkIterator(Chunk *chunk) : chunk(chunk) {
+template<typename T, size_t ChunkSize>
+ChunkedList<T, ChunkSize>::ChunkIterator::ChunkIterator(Chunk *chunk) : chunk(chunk) {
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-typename ChunkedList<T, ChunkSize, ShouldCopy>::ChunkIterator
-ChunkedList<T, ChunkSize, ShouldCopy>::ChunkIterator::operator++() {
+template<typename T, size_t ChunkSize>
+typename ChunkedList<T, ChunkSize>::ChunkIterator
+ChunkedList<T, ChunkSize>::ChunkIterator::operator++() {
   chunk = chunk->nextChunk;
   return *this;
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-typename ChunkedList<T, ChunkSize, ShouldCopy>::ChunkIterator
-ChunkedList<T, ChunkSize, ShouldCopy>::ChunkIterator::operator++(int) {
+template<typename T, size_t ChunkSize>
+typename ChunkedList<T, ChunkSize>::ChunkIterator
+ChunkedList<T, ChunkSize>::ChunkIterator::operator++(int) {
   Iterator original = *this;
   chunk = chunk->nextChunk;
   return original;
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-typename ChunkedList<T, ChunkSize, ShouldCopy>::ChunkIterator
-ChunkedList<T, ChunkSize, ShouldCopy>::ChunkIterator::operator--() {
+template<typename T, size_t ChunkSize>
+typename ChunkedList<T, ChunkSize>::ChunkIterator
+ChunkedList<T, ChunkSize>::ChunkIterator::operator--() {
   chunk = chunk->prevChunk;
   return *this;
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-typename ChunkedList<T, ChunkSize, ShouldCopy>::ChunkIterator
-ChunkedList<T, ChunkSize, ShouldCopy>::ChunkIterator::operator--(int) {
+template<typename T, size_t ChunkSize>
+typename ChunkedList<T, ChunkSize>::ChunkIterator
+ChunkedList<T, ChunkSize>::ChunkIterator::operator--(int) {
   Iterator original = *this;
   chunk = chunk->prevChunk;
   return original;
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-typename ChunkedList<T, ChunkSize, ShouldCopy>::ChunkIterator
-ChunkedList<T, ChunkSize, ShouldCopy>::ChunkIterator::operator+(size_t offset) const {
+template<typename T, size_t ChunkSize>
+typename ChunkedList<T, ChunkSize>::ChunkIterator
+ChunkedList<T, ChunkSize>::ChunkIterator::operator+(size_t offset) const {
   Chunk *ptr{chunk};
 
   for (; offset > 0; --offset)
@@ -292,9 +291,9 @@ ChunkedList<T, ChunkSize, ShouldCopy>::ChunkIterator::operator+(size_t offset) c
   return ChunkIterator{ptr};
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-typename ChunkedList<T, ChunkSize, ShouldCopy>::ChunkIterator
-ChunkedList<T, ChunkSize, ShouldCopy>::ChunkIterator::operator-(size_t offset) const {
+template<typename T, size_t ChunkSize>
+typename ChunkedList<T, ChunkSize>::ChunkIterator
+ChunkedList<T, ChunkSize>::ChunkIterator::operator-(size_t offset) const {
   Chunk *ptr{chunk};
 
   for (; offset > 0; --offset)
@@ -303,70 +302,68 @@ ChunkedList<T, ChunkSize, ShouldCopy>::ChunkIterator::operator-(size_t offset) c
   return ChunkIterator{ptr};
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-typename ChunkedList<T, ChunkSize, ShouldCopy>::ChunkIterator
-ChunkedList<T, ChunkSize, ShouldCopy>::ChunkIterator::operator+=(const size_t offset) {
+template<typename T, size_t ChunkSize>
+typename ChunkedList<T, ChunkSize>::ChunkIterator
+ChunkedList<T, ChunkSize>::ChunkIterator::operator+=(const size_t offset) {
   return *this = operator+(offset);
 }
 
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-typename ChunkedList<T, ChunkSize, ShouldCopy>::ChunkIterator
-ChunkedList<T, ChunkSize, ShouldCopy>::ChunkIterator::operator-=(const size_t offset) {
+template<typename T, size_t ChunkSize>
+typename ChunkedList<T, ChunkSize>::ChunkIterator
+ChunkedList<T, ChunkSize>::ChunkIterator::operator-=(const size_t offset) {
   return *this = operator-(offset);
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-typename ChunkedList<T, ChunkSize, ShouldCopy>::Chunk &ChunkedList<T, ChunkSize, ShouldCopy>::ChunkIterator::operator
+template<typename T, size_t ChunkSize>
+typename ChunkedList<T, ChunkSize>::Chunk &ChunkedList<T, ChunkSize>::ChunkIterator::operator
 *() {
   return *chunk;
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-typename ChunkedList<T, ChunkSize, ShouldCopy>::Chunk *ChunkedList<T, ChunkSize, ShouldCopy>::ChunkIterator::operator
+template<typename T, size_t ChunkSize>
+typename ChunkedList<T, ChunkSize>::Chunk *ChunkedList<T, ChunkSize>::ChunkIterator::operator
 ->() {
   return chunk;
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-const typename ChunkedList<T, ChunkSize, ShouldCopy>::Chunk &ChunkedList<T, ChunkSize,
-  ShouldCopy>::ChunkIterator::operator*() const {
+template<typename T, size_t ChunkSize>
+const typename ChunkedList<T, ChunkSize>::Chunk &ChunkedList<T, ChunkSize>::ChunkIterator::operator*() const {
   return *chunk;
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-const typename ChunkedList<T, ChunkSize, ShouldCopy>::Chunk *ChunkedList<T, ChunkSize,
-  ShouldCopy>::ChunkIterator::operator->() const {
+template<typename T, size_t ChunkSize>
+const typename ChunkedList<T, ChunkSize>::Chunk *ChunkedList<T, ChunkSize>::ChunkIterator::operator->() const {
   return chunk;
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-bool ChunkedList<T, ChunkSize, ShouldCopy>::ChunkIterator::operator==(const ChunkIterator other) const {
+template<typename T, size_t ChunkSize>
+bool ChunkedList<T, ChunkSize>::ChunkIterator::operator==(const ChunkIterator other) const {
   return other.chunk == chunk;
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-bool ChunkedList<T, ChunkSize, ShouldCopy>::ChunkIterator::operator==(const ConstChunkIterator other) const {
+template<typename T, size_t ChunkSize>
+bool ChunkedList<T, ChunkSize>::ChunkIterator::operator==(const ConstChunkIterator other) const {
   return other.chunk == chunk;
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-bool ChunkedList<T, ChunkSize, ShouldCopy>::ChunkIterator::operator!=(const ChunkIterator other) const {
+template<typename T, size_t ChunkSize>
+bool ChunkedList<T, ChunkSize>::ChunkIterator::operator!=(const ChunkIterator other) const {
   return other.chunk != chunk;
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-bool ChunkedList<T, ChunkSize, ShouldCopy>::ChunkIterator::operator!=(const ConstChunkIterator other) const {
+template<typename T, size_t ChunkSize>
+bool ChunkedList<T, ChunkSize>::ChunkIterator::operator!=(const ConstChunkIterator other) const {
   return other.chunk != chunk;
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-T &ChunkedList<T, ChunkSize, ShouldCopy>::ChunkIterator::operator[](const size_t index) {
+template<typename T, size_t ChunkSize>
+T &ChunkedList<T, ChunkSize>::ChunkIterator::operator[](const size_t index) {
   return (*chunk)[index];
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-const T &ChunkedList<T, ChunkSize, ShouldCopy>::ChunkIterator::operator[](const size_t index) const {
+template<typename T, size_t ChunkSize>
+const T &ChunkedList<T, ChunkSize>::ChunkIterator::operator[](const size_t index) const {
   return (*chunk)[index];
 }
 
@@ -381,23 +378,21 @@ const T &ChunkedList<T, ChunkSize, ShouldCopy>::ChunkIterator::operator[](const 
 
 */
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-ChunkedList<T, ChunkSize, ShouldCopy>::ConstChunkIterator::ConstChunkIterator(Chunk *chunk) : ChunkIterator(chunk) {
+template<typename T, size_t ChunkSize>
+ChunkedList<T, ChunkSize>::ConstChunkIterator::ConstChunkIterator(Chunk *chunk) : ChunkIterator(chunk) {
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-const typename ChunkedList<T, ChunkSize, ShouldCopy>::Chunk &ChunkedList<T, ChunkSize,
-  ShouldCopy>::ConstChunkIterator::operator*() const {
+template<typename T, size_t ChunkSize>
+const typename ChunkedList<T, ChunkSize>::Chunk &ChunkedList<T, ChunkSize>::ConstChunkIterator::operator*() const {
   return ChunkIterator::operator*();
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-const typename ChunkedList<T, ChunkSize, ShouldCopy>::Chunk *ChunkedList<T, ChunkSize,
-  ShouldCopy>::ConstChunkIterator::operator->() const {
+template<typename T, size_t ChunkSize>
+const typename ChunkedList<T, ChunkSize>::Chunk *ChunkedList<T, ChunkSize>::ConstChunkIterator::operator->() const {
   return ChunkIterator::operator->();
 }
 
-template<typename T, size_t ChunkSize, bool ShouldCopy>
-const T &ChunkedList<T, ChunkSize, ShouldCopy>::ConstChunkIterator::operator[](size_t index) const {
+template<typename T, size_t ChunkSize>
+const T &ChunkedList<T, ChunkSize>::ConstChunkIterator::operator[](size_t index) const {
   return ChunkIterator::operator[](index);
 }

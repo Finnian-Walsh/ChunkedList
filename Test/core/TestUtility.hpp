@@ -67,9 +67,9 @@ namespace TestUtility {
 
   void performTask(const char *taskName, int logLevel = 10);
 
-  template<typename T, size_t ChunkSize, bool ShouldCopy>
-  class ChunkedListAccessor final : ChunkedList<T, ChunkSize, ShouldCopy> {
-    using DerivedChunkedList = ChunkedList<T, ChunkSize, ShouldCopy>;
+  template<typename T, size_t ChunkSize>
+  class ChunkedListAccessor final : ChunkedList<T, ChunkSize> {
+    using DerivedChunkedList = ChunkedList<T, ChunkSize>;
 
     public:
       size_t getChunkCount() {
@@ -88,27 +88,26 @@ namespace TestUtility {
   namespace Tests {
     using DefaultT = int;
     constexpr size_t DefaultChunkSize = 32;
-    constexpr bool DefaultShouldCopy = true;
 
-    template<template <typename, size_t, bool> typename ChunkedListType, size_t ChunkSize>
+    template<template <typename, size_t> typename ChunkedListType, size_t ChunkSize>
     void FrontAndBack();
 
-    template<template <typename, size_t, bool> typename ChunkedListType, size_t ChunkSize>
+    template<template <typename, size_t> typename ChunkedListType, size_t ChunkSize>
     void Insertion();
 
-    template<SortType SortingAlgorithm, template<typename, size_t, bool> typename ChunkedListType>
+    template<SortType SortingAlgorithm, template<typename, size_t> typename ChunkedListType>
     void Sorting();
 
-    template<template <typename, size_t, bool> typename ChunkedListType, size_t ChunkSize>
+    template<template <typename, size_t> typename ChunkedListType, size_t ChunkSize>
     void Iterators();
 
-    template<template <typename, size_t, bool> typename ChunkedListType, size_t ChunkSize>
+    template<template <typename, size_t> typename ChunkedListType, size_t ChunkSize>
     void PushingAndPopping();
 
-    template<template <typename, size_t, bool> typename ChunkedListType, size_t ChunkSize>
+    template<template <typename, size_t> typename ChunkedListType, size_t ChunkSize>
     void EqualityAndInequality();
 
-    template<template <typename, size_t, bool> typename ChunkedListType, size_t ChunkSize>
+    template<template <typename, size_t> typename ChunkedListType, size_t ChunkSize>
     void ConcatenationAndIndexing();
   }
 }
