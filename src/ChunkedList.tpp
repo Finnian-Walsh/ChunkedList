@@ -18,7 +18,7 @@ void ChunkedList<T, ChunkSize>::pushChunk(Chunk *chunk) {
 
 template<typename T, size_t ChunkSize>
 ChunkedList<T, ChunkSize>::ChunkedList() {
-  front = back = new Chunk();
+  front = back = new Chunk{};
 }
 
 template<typename T, size_t ChunkSize>
@@ -122,10 +122,10 @@ typename ChunkedList<T, ChunkSize>::ChunkIterator ChunkedList<T, ChunkSize>::end
 template<typename T, size_t ChunkSize>
 void ChunkedList<T, ChunkSize>::push(T value) {
   if (back->nextIndex == ChunkSize) {
-    pushChunk(new Chunk{std::move(value)});
+    pushChunk(new Chunk{std::forward<T>(value)});
     ++chunkCount;
   } else {
-    (*back)[back->nextIndex] = value;
+    (*back)[back->nextIndex] = std::forward<T>(value);
     ++back->nextIndex;
   }
 }
@@ -136,7 +136,7 @@ void ChunkedList<T, ChunkSize>::emplace(Args &&... args) {
   if (back->nextIndex == ChunkSize) {
     pushChunk(new Chunk{T(std::forward<Args>(args)...)});
   } else {
-    std::move(T{std::forward<Args>(args)...});
+    (*back)[back->nextIndex] = std::move(T(std::forward<Args>(args)...));
     ++back->nextIndex;
   }
 }
