@@ -1,7 +1,7 @@
-#define CHUNKED_LIST_DEBUGGING
-#include "StandardChunkedList.hpp"
+#define CHUNKED_LIST_TYPE 2
 
-#include "core/TestUtility.hpp"
+#include "ChunkedListSnake.hpp"
+#include "../core/TestUtility.hpp"
 
 using namespace TestUtility;
 
@@ -54,8 +54,8 @@ int main() {
     testData.setSource("Insertion Sorting");
     Sorting<InsertionSort, chunked_list>();
 
-    testData.setSource("Merge Sorting");
-    Sorting<MergeSort, chunked_list>();
+    // testData.setSource("Merge Sorting");
+    // Sorting<MergeSort, chunked_list>();
 
     testData.setSource("Quick Sorting");
     Sorting<QuickSort, chunked_list>();

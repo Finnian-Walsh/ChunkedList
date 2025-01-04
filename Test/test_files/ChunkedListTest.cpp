@@ -1,11 +1,6 @@
-// #define CHUNKED_LIST_DEBUGGING
+#define CHUNKED_LIST_TYPE 1
 
-#include "ChunkedList.hpp"
-#include "ChunkedListAccessor.hpp"
-
-#define LOG_LEVEL 0
-
-#include "core/TestUtility.hpp"
+#include "../core/TestUtility.hpp"
 
 using namespace TestUtility;
 
