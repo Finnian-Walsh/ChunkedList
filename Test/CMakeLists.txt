@@ -11,15 +11,15 @@ include_directories(../include)
 
 add_executable(ChunkedListTest
         ${SRC_FILES}
-        ChunkedListTest.cpp
+        test_files/ChunkedListTest.cpp
 )
 
-add_executable(StandardChunkedListTest
+add_executable(ChunkedListSnakeTest
         ${SRC_FILES}
-        StandardChunkedListTest.cpp
+        test_files/ChunkedListSnakeTest.cpp
 )
 
 add_executable(CopyTest
         ${SRC_FILES}
-        CopyTests.cpp
+        test_files/CopyTests.cpp
 )
