@@ -68,6 +68,7 @@ inline bool TestData::taskIsNull() const {
 
 inline void TestUtility::callFunction(const char *functionName, void (*functionPtr)()) {
   std::cout << "Test " << testNumber << ": " << functionName << '\n';
+  ++testNumber;
 
   try {
     testData.newTest(functionName);
@@ -81,7 +82,6 @@ inline void TestUtility::callFunction(const char *functionName, void (*functionP
   }
 
   std::cout << "Test " << testNumber << " successful\n" << std::endl;
-  ++testNumber;
 }
 
 inline void TestUtility::performTask(const char *taskName, const int logLevel) {
