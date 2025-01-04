@@ -55,4 +55,3 @@ namespace ChunkedListUtility {
 }
 
 #include "../src/ChunkedListUtility.tpp"
-

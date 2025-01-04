@@ -147,11 +147,11 @@ void SortFunctions::heapSort(ChunkedList<T, ChunkSize> &chunkedList) {
   std::priority_queue<T, std::vector<T>, Compare> heap{};
 
   for (auto it = chunkedList.begin(); it != chunkedList.end(); ++it) {
-    heap.push(*it);
+    heap.push(std::move(*it));
   }
 
   for (auto iterator = chunkedList.end() - 1;; --iterator) {
-    *iterator = heap.top();
+    *iterator = std::move(heap.top());
     heap.pop();
 
     if (iterator == chunkedList.begin()) break;
