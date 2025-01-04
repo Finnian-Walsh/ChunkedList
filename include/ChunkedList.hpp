@@ -22,10 +22,7 @@ class ChunkedList {
 
         Chunk(const T *array, size_t size, Chunk *nextChunk = nullptr, Chunk *prevChunk = nullptr);
 
-        /**
-         * @brief creates a chunk with an initializer list - does not check for overflows
-         **/
-        Chunk(std::initializer_list<T> initializerList);
+        explicit Chunk(T value);
 
         Chunk() = default;
 
