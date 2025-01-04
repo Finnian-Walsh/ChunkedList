@@ -193,7 +193,7 @@ Hello world!
 For projects where `snake_case` naming conventions are used, include:
 
 ```cpp
-#include "StandardChunkedList.hpp"
+#include "ChunkedListSnake.hpp"
 ```
 
 This implements the **chunked_list** class, with identical functionality to the **ChunkedList**.
@@ -201,7 +201,7 @@ This implements the **chunked_list** class, with identical functionality to the 
 ### Example
 
 ```cpp
-#include "StandardChunkedList.hpp"
+#include "ChunkedListSnake.hpp"
 
 #include <random>
 
