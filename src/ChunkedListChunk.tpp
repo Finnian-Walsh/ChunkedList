@@ -22,14 +22,7 @@ ChunkedList<T, ChunkSize>::Chunk::Chunk(const T *array, const size_t size, Chunk
 }
 
 template<typename T, size_t ChunkSize>
-ChunkedList<T, ChunkSize>::Chunk::Chunk(std::initializer_list<T> initializerList) : nextIndex(
-  initializerList.size()) {
-  for (int index = 0; index < initializerList.size(); ++index) {
-    DEBUG_LOG(initializerList.begin()[index] << ' ')
-    data[index] = initializerList.begin()[index];
-  }
-
-  DEBUG_LINE(true)
+ChunkedList<T, ChunkSize>::Chunk::Chunk(T value) : data{std::move(value)}, nextIndex{1} {
 }
 
 /**
@@ -88,7 +81,8 @@ bool ChunkedList<T, ChunkSize>::Chunk::operator!=(const Chunk &other) const {
 template<typename T, size_t ChunkSize>
 void ChunkedList<T, ChunkSize>::Chunk::debugData(std::string &str) const {
   std::ostringstream oss{};
-  oss << "ChunkedList<" << typeid(T).name() << ", " << std::to_string(ChunkSize) << ">::Chunk(nextIndex=" << nextIndex << ", nextChunk=" << nextChunk <<
+  oss << "ChunkedList<" << typeid(T).name() << ", " << std::to_string(ChunkSize) << ">::Chunk(nextIndex=" << nextIndex
+  << ", nextChunk=" << nextChunk <<
   ", prevChunk = " << prevChunk;
 
   if (empty()) {
