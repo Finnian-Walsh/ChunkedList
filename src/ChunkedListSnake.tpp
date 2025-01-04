@@ -1,6 +1,6 @@
 #pragma once
 
-#include "StandardChunkedList.hpp"
+#include "ChunkedListSnake.hpp"
 
 template<typename T, size_t ChunkSize>
 typename chunked_list<T, ChunkSize>::chunk_iterator chunked_list<T, ChunkSize>::begin_chunk() {
@@ -13,8 +13,8 @@ typename chunked_list<T, ChunkSize>::chunk_iterator chunked_list<T, ChunkSize>::
 }
 
 template<typename T, size_t ChunkSize>
-void chunked_list<T, ChunkSize>::push_back(typename derived_chunked_list::ValueType value) {
-  derived_chunked_list::push(value);
+void chunked_list<T, ChunkSize>::push_back(T value) {
+  derived_chunked_list::push(std::forward<T>(value));
 }
 
 template<typename T, size_t ChunkSize>
@@ -33,6 +33,16 @@ size_t chunked_list<T, ChunkSize>::length() const {
 }
 
 template<typename T, size_t ChunkSize>
+bool chunked_list<T, ChunkSize>::operator==(const chunked_list& other) const {
+  return derived_chunked_list::operator==(other);
+}
+
+template<typename T, size_t ChunkSize>
+bool chunked_list<T, ChunkSize>::operator!=(const chunked_list& other) const {
+  return derived_chunked_list::operator!=(other);
+}
+
+template<typename T, size_t ChunkSize>
 std::ostream &operator<<(std::ostream &os, chunked_list<T, ChunkSize> &chunkedList) {
-  return operator<<(os, static_cast<ChunkedList<T, ChunkSize>>(chunkedList));
+  return operator<<(os, *reinterpret_cast<ChunkedList<T, ChunkSize>*>(&chunkedList));
 }

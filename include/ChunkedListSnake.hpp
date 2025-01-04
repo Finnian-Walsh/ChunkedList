@@ -9,8 +9,6 @@ class chunked_list final : ChunkedList<T, ChunkSize> {
   using derived_chunked_list = ChunkedList<T, ChunkSize>;
 
   public:
-    using value_type = typename derived_chunked_list::ValueType;
-
     using iterator = typename derived_chunked_list::Iterator;
 
     using const_iterator = typename derived_chunked_list::ConstIterator;
@@ -29,7 +27,7 @@ class chunked_list final : ChunkedList<T, ChunkSize> {
 
     chunk_iterator end_chunk();
 
-    void push_back(value_type value);
+    void push_back(T value);
 
     void pop_back();
 
@@ -43,9 +41,9 @@ class chunked_list final : ChunkedList<T, ChunkSize> {
 
     using derived_chunked_list::empty;
 
-    using derived_chunked_list::operator==;
+    bool operator==(const chunked_list &other) const;
 
-    using derived_chunked_list::operator!=;
+    bool operator!=(const chunked_list &other) const;
 
     using derived_chunked_list::concat;
 
@@ -53,4 +51,4 @@ class chunked_list final : ChunkedList<T, ChunkSize> {
     friend std::ostream &operator<<(std::ostream &os, chunked_list &chunkedList);
 };
 
-#include "../src/StandardChunkedList.tpp"
+#include "../src/ChunkedListSnake.tpp"
