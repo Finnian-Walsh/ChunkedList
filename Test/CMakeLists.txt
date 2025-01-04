@@ -21,5 +21,5 @@ add_executable(ChunkedListSnakeTest
 
 add_executable(CopyTest
         ${SRC_FILES}
-        test_files/CopyTests.cpp
+        test_files/CustomTests.cpp
 )
