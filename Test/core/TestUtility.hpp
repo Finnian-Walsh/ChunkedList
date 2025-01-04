@@ -8,6 +8,18 @@
 #define SUCCESS std::cout << "All " << testNumber - 1 << " tests have been ran."; return EXIT_SUCCESS;
 #define THROW_IF(condition, str) if (condition) { throw std::runtime_error(str); }
 
+#ifndef CHUNKED_LIST_TYPE
+#define CHUNKED_LIST_TYPE 1
+#endif
+
+#if CHUNKED_LIST_TYPE == 1
+#define VARIANT_CODE(CamelCaseChunkedListCode, SnakeCaseChunkedListCode) CamelCaseChunkedListCode
+#elif CHUNKED_LIST_TYPE == 2
+#define VARIANT_CODE(CamelCaseChunkedListCode, SnakeCaseChunkedListCode) SnakeCaseChunkedListCode
+#else
+#error "Unsupported chunked list variant"
+#endif
+
 namespace TestUtility {
 #ifdef LOG_LEVEL
   constexpr inline int LogLevel = LOG_LEVEL;

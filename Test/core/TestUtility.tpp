@@ -128,7 +128,7 @@ void Tests::Insertion() {
     int num = rng(-1000, 1000);
     expectedOutput += ", ";
     expectedOutput += std::to_string(num);
-    chunkedList.push(num);
+    VARIANT_CODE(chunkedList.push, chunkedList.push_back)(num);
   }
 
   expectedOutput.push_back(']');
@@ -151,7 +151,7 @@ void Tests::Sorting() {
 
   performTask("Pushing or using the RNG");
   for (int i{}; i < 100; ++i) {
-    list.push(rng(1, 100));
+    VARIANT_CODE(list.push, list.push_back)(rng(1, 100));
   }
 
   performTask("Sorting");
@@ -187,8 +187,8 @@ void Tests::PushingAndPopping() {
 
   performTask("Pushing");
   for (int i = 0; i < 10; ++i) {
-    chunkedList.push('a');
-    chunkedList.push('b');
+    VARIANT_CODE(chunkedList.push, chunkedList.push_back)('a');
+    VARIANT_CODE(chunkedList.push, chunkedList.push_back)('b');
   }
 
   for (int i = 20; i > 1; --i) {
@@ -196,7 +196,7 @@ void Tests::PushingAndPopping() {
     THROW_IF(i != chunkedList.size(), "Unexpected ChunkedList size")
 
     performTask("Popping");
-    chunkedList.pop();
+    VARIANT_CODE(chunkedList.pop, chunkedList.pop_back)();
   }
 
   performTask("Indexing");
@@ -228,7 +228,7 @@ void Tests::ConcatenationAndIndexing() {
 
   performTask("Pushing");
   for (int i = 0; i < 10; ++i)
-    chunkedList.push(i); {
+    VARIANT_CODE(chunkedList.push, chunkedList.push_back)(i); {
     performTask("Concatenation");
     std::string &&str = chunkedList.concat(" ");
     THROW_IF(str != "0 1 2 3 4 5 6 7 8 9",
@@ -254,41 +254,41 @@ void Tests::EqualityAndInequality() {
   performTask("Pushing");
 
   for (int i = 1; i < 4; ++i) {
-    list1.push(i);
-    list2.push(i);
+    VARIANT_CODE(list1.push, list1.push_back)(i);
+    VARIANT_CODE(list2.push, list2.push_back)(i);
   }
 
-  list1.push(4);
-  list2.push(3);
+  VARIANT_CODE(list1.push, list1.push_back)(4);
+  VARIANT_CODE(list2.push, list2.push_back)(3);
 
   THROW_IF(list1 == list2, "List comparison 1 failed")
 
   performTask("Popping");
-  list2.pop();
+  VARIANT_CODE(list2.pop, list2.pop_back)();
 
   performTask("Pushing");
-  list2.push(4);
+  VARIANT_CODE(list2.push, list2.push_back)(4);
 
   performTask("ChunkedList inequality");
   THROW_IF(list1 != list2, "List comparison 2 failed")
 
   performTask("Pushing");
   for (int i = 0; i < 80; ++i) {
-    list1.push(i);
-    list2.push(i);
+    VARIANT_CODE(list1.push, list1.push_back)(i);
+    VARIANT_CODE(list2.push, list2.push_back)(i);
   }
 
-  list1.push(1);
-  list2.push(1);
+  VARIANT_CODE(list1.push, list1.push_back)(1);
+  VARIANT_CODE(list2.push, list2.push_back)(1);
 
   performTask("ChunkedList inequality");
   THROW_IF(list1 != list2, "List comparison 3 failed")
 
   performTask("Popping");
-  list2.pop();
+  VARIANT_CODE(list2.pop, list2.pop_back)();
 
   performTask("Pushing");
-  list2.push(2);
+  VARIANT_CODE(list2.push, list2.push_back)(2);
 
   performTask("List equality");
   THROW_IF(list1 == list2, "List comparison 4 failed")
