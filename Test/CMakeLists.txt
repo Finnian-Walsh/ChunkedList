@@ -19,7 +19,7 @@ add_executable(ChunkedListSnakeTest
         test_files/ChunkedListSnakeTest.cpp
 )
 
-add_executable(CopyTest
+add_executable(CustomTest
         ${SRC_FILES}
         test_files/CustomTests.cpp
 )
