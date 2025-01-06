@@ -1,41 +1,31 @@
 #include "../core/TestUtility.hpp"
 
-class DataClass;
+#include <chrono>
+#include <ranges>
+#include <numeric>
 
-using T = std::vector<int>;
-using ListType = ChunkedList<T, 1>;
-
-class DataClass {
-  public:
-    int *memory{};
-
-    DataClass() : memory{new int()} {
-    }
-
-    explicit DataClass(const int i) : memory{new int{i}} {
-    }
-
-    ~DataClass() {
-      if (memory) {
-        delete memory;
-      }
-    }
-};
-
+using namespace TestUtility;
 
 int main() {
-  ListType list{};
+  callFunction("Integer push time test", [] {
+    ChunkedList<int, 1'000'000'000> testList;
 
-  T vec{1};
+    std::cout << "starting..." << std::endl;
 
-  vec.emplace_back(1);
+    const auto start = std::chrono::high_resolution_clock::now();
 
-  list.emplace(std::initializer_list{1, 2, 3});
+    constexpr size_t pushes = 1'000'000'000;
 
-  const T &element = list[0];
+    for (int i = 0; i < pushes; i++) {
+      testList.push(i);
+    }
 
-  std::ranges::for_each(element, [](const int n) -> void {
-    std::cout << n << ' ';
+    const auto end = std::chrono::high_resolution_clock::now();
+    const auto duration_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+    const auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+
+    std::cout << "Total time taken to push " << pushes << " integers: " << duration_ms.count() << " milliseconds\n";
+    std::cout << "Average time to push 1 integer: " << duration_ns.count() / pushes << " nanoseconds" << std::endl;
   });
 
   return 0;

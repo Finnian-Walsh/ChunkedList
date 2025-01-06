@@ -6,7 +6,7 @@
 
 #define BEGIN std::cout << "Starting tests..." << std::endl;
 #define SUCCESS std::cout << "All " << testNumber << " tests have been ran.\n" << std::endl; return EXIT_SUCCESS;
-#define THROW_IF(condition, str) if (condition) { throw std::runtime_error(str); }
+#define THROW_IF(condition, str) if (condition) throw std::runtime_error(str);
 
 #ifndef CHUNKED_LIST_TYPE
 #define CHUNKED_LIST_TYPE 1

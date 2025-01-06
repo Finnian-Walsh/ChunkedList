@@ -67,8 +67,8 @@ inline bool TestData::taskIsNull() const {
 }
 
 inline void TestUtility::callFunction(const char *functionName, void (*functionPtr)()) {
-  std::cout << "Test " << testNumber << ": " << functionName << '\n';
   ++testNumber;
+  std::cout << "Test " << testNumber << ": " << functionName << '\n';
 
   try {
     testData.newTest(functionName);
@@ -128,7 +128,7 @@ void Tests::Insertion() {
     int num = rng(-1000, 1000);
     expectedOutput += ", ";
     expectedOutput += std::to_string(num);
-    VARIANT_CODE(chunkedList.push, chunkedList.push_back)(num);
+    chunkedList.push(num);
   }
 
   expectedOutput.push_back(']');
@@ -151,7 +151,7 @@ void Tests::Sorting() {
 
   performTask("Pushing or using the RNG");
   for (int i{}; i < 100; ++i) {
-    VARIANT_CODE(list.push, list.push_back)(rng(1, 100));
+    list.push(rng(1, 100));
   }
 
   performTask("Sorting");
@@ -187,8 +187,8 @@ void Tests::PushingAndPopping() {
 
   performTask("Pushing");
   for (int i = 0; i < 10; ++i) {
-    VARIANT_CODE(chunkedList.push, chunkedList.push_back)('a');
-    VARIANT_CODE(chunkedList.push, chunkedList.push_back)('b');
+    chunkedList.push('a');
+    chunkedList.push('b');
   }
 
   for (int i = 20; i > 1; --i) {
@@ -196,7 +196,7 @@ void Tests::PushingAndPopping() {
     THROW_IF(i != chunkedList.size(), "Unexpected ChunkedList size")
 
     performTask("Popping");
-    VARIANT_CODE(chunkedList.pop, chunkedList.pop_back)();
+    chunkedList.pop();
   }
 
   performTask("Indexing");
@@ -211,14 +211,64 @@ void Tests::Iterators() {
   using ListType = ChunkedListType<DefaultT, ChunkSize>;
 
   performTask("List creation");
-  ListType chunkedList{1, 2, 3, 4, 5};
-  int total{};
+  ListType chunkedList{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+  const ListType &constListRef = chunkedList; {
+    int total{};
 
-  performTask("List iteration (implicit)");
-  for (const int num: chunkedList)
-    total += num;
+    performTask("List iteration (implicit)");
+    for (const int num: chunkedList)
+      total += num;
 
-  THROW_IF(total != 15, "List sum is not 15")
+    THROW_IF(total != 55, std::string{"List sum is not 55; got "} += std::to_string(total))
+  } {
+    auto begin = chunkedList.begin();
+    auto constBegin = constListRef.begin();
+    auto it2 = std::next(begin);
+
+    THROW_IF(it2 != begin + 1, "std::next(Iterator) is unequal to Iterator + 1");
+    THROW_IF(!(it2 == begin + 1), "std::next(Iterator) is not equal to Iterator + 1")
+    THROW_IF(std::prev(it2) != begin, "std::prev(std::next(Iterator)) unequal to Iterator");
+    THROW_IF(it2 - 1 != begin, "std::next(Iterator) - 1 is unequal to Iterator")
+
+    THROW_IF(begin != constBegin, "Iterator is unequal to const Iterator")
+    THROW_IF(constBegin != begin, "const Iterator is unequal to Iterator")
+    THROW_IF(it2 != std::next(constBegin), "std::next(Iterator) is unequal to std::next(const Iterator)")
+
+    THROW_IF(begin + 9 != constBegin + 9, "Iterator + 9 is unequal to const Iterator + 9")
+  } {
+    auto beginChunk = chunkedList.VARIANT_CODE(beginChunk, begin_chunk)();
+    auto constBeginChunk = constListRef.VARIANT_CODE(beginChunk, begin_chunk)();
+
+    THROW_IF(beginChunk != constBeginChunk, "ChunkIterator is unequal to const ChunkIterator")
+    THROW_IF(constBeginChunk != beginChunk, "const ChunkIterator is unequal to ChunkIterator")
+
+    THROW_IF(!(beginChunk == constBeginChunk), "ChunkIterator is not equal to const ChunkIterator")
+    THROW_IF(!(beginChunk == constBeginChunk), "const ChunkIterator is not equal to ChunkIterator")
+
+    THROW_IF(std::next(beginChunk) != beginChunk + 1, "std::next(ChunkIterator) is not equal to ChunkIterator + 1")
+    int tracker = 1;
+
+    for (auto chunkIt = beginChunk; chunkIt != chunkedList.VARIANT_CODE(endChunk, end_chunk)(); ++chunkIt) {
+      performTask("ChunkIterator dereferencing");
+      auto &chunkRef = *chunkIt;
+      performTask("Chunk indexing");
+      for (int i = 0; i < chunkRef.nextIndex; ++i) {
+        THROW_IF(chunkRef[i] != tracker,
+                 (std::string{"Invalid number. Got "} += std::to_string(chunkRef[i]) += " but expected ") += std::
+                 to_string(tracker))
+        ++tracker;
+      }
+    }
+  }
+  performTask("Pushing");
+  for (int i = 11; i <= 1000; ++i) {
+    chunkedList.push(i);
+  } {
+    auto chunkIt = chunkedList.VARIANT_CODE(beginChunk, begin_chunk)();
+    auto chunkIt2 = chunkIt + 1;
+    THROW_IF(chunkIt2 - 1 != chunkIt, "ChunkIterator + 1 - 1 is unequal to ChunkIterator")
+    THROW_IF(chunkIt2 != ++chunkIt, "ChunkIterator + 1 is unequal to ++ChunkIterator")
+  }
 }
 
 template<template <typename, size_t> typename ChunkedListType, size_t ChunkSize>
@@ -228,7 +278,7 @@ void Tests::ConcatenationAndIndexing() {
 
   performTask("Pushing");
   for (int i = 0; i < 10; ++i)
-    VARIANT_CODE(chunkedList.push, chunkedList.push_back)(i); {
+    chunkedList.push(i); {
     performTask("Concatenation");
     std::string &&str = chunkedList.concat(" ");
     THROW_IF(str != "0 1 2 3 4 5 6 7 8 9",
@@ -254,41 +304,41 @@ void Tests::EqualityAndInequality() {
   performTask("Pushing");
 
   for (int i = 1; i < 4; ++i) {
-    VARIANT_CODE(list1.push, list1.push_back)(i);
-    VARIANT_CODE(list2.push, list2.push_back)(i);
+    list1.push(i);
+    list2.push(i);
   }
 
-  VARIANT_CODE(list1.push, list1.push_back)(4);
-  VARIANT_CODE(list2.push, list2.push_back)(3);
+  list1.push(4);
+  list2.push(3);
 
   THROW_IF(list1 == list2, "List comparison 1 failed")
 
   performTask("Popping");
-  VARIANT_CODE(list2.pop, list2.pop_back)();
+  list2.pop();
 
   performTask("Pushing");
-  VARIANT_CODE(list2.push, list2.push_back)(4);
+  list2.push(4);
 
   performTask("ChunkedList inequality");
   THROW_IF(list1 != list2, "List comparison 2 failed")
 
   performTask("Pushing");
   for (int i = 0; i < 80; ++i) {
-    VARIANT_CODE(list1.push, list1.push_back)(i);
-    VARIANT_CODE(list2.push, list2.push_back)(i);
+    list1.push(i);
+    list2.push(i);
   }
 
-  VARIANT_CODE(list1.push, list1.push_back)(1);
-  VARIANT_CODE(list2.push, list2.push_back)(1);
+  list1.push(1);
+  list2.push(1);
 
   performTask("ChunkedList inequality");
   THROW_IF(list1 != list2, "List comparison 3 failed")
 
   performTask("Popping");
-  VARIANT_CODE(list2.pop, list2.pop_back)();
+  list2.pop();
 
   performTask("Pushing");
-  VARIANT_CODE(list2.push, list2.push_back)(2);
+  list2.push(2);
 
   performTask("List equality");
   THROW_IF(list1 == list2, "List comparison 4 failed")
