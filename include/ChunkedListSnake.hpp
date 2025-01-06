@@ -9,35 +9,41 @@ class chunked_list final : ChunkedList<T, ChunkSize> {
   using derived_chunked_list = ChunkedList<T, ChunkSize>;
 
   public:
+    using derived_chunked_list::ChunkedList;
+
+    using chunk_iterator = typename derived_chunked_list::ChunkIterator;
+
+    using const_chunk_iterator = typename derived_chunked_list::ConstChunkIterator;
+
     using iterator = typename derived_chunked_list::Iterator;
 
     using const_iterator = typename derived_chunked_list::ConstIterator;
-
-    using chunk_iterator = typename derived_chunked_list::ConstIterator;
-
-    using derived_chunked_list::ChunkedList;
 
     using derived_chunked_list::operator[];
 
     using derived_chunked_list::begin;
 
+    using derived_chunked_list::end;
+
     chunk_iterator begin_chunk();
 
-    using derived_chunked_list::end;
+    const_chunk_iterator begin_chunk() const;
 
     chunk_iterator end_chunk();
 
-    void push_back(T value);
+    const_chunk_iterator end_chunk() const;
 
-    void pop_back();
+    using derived_chunked_list::push;
 
-    void pop_back_chunk();
+    using derived_chunked_list::emplace;
+
+    using derived_chunked_list::pop;
+
+    void pop_chunk();
 
     using derived_chunked_list::sort;
 
     using derived_chunked_list::size;
-
-    size_t length() const;
 
     using derived_chunked_list::empty;
 
