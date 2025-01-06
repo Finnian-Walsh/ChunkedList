@@ -25,9 +25,6 @@ template<typename T, size_t ChunkSize>
 ChunkedList<T, ChunkSize>::Chunk::Chunk(T value) : data{std::move(value)}, nextIndex{1} {
 }
 
-/**
- * @brief returns the chunk x chunks ahead of the given chunk. Does not account for overflows
- */
 template<typename T, size_t ChunkSize>
 typename ChunkedList<T, ChunkSize>::Chunk &
 ChunkedList<T, ChunkSize>::Chunk::operator+(const size_t offset) {
@@ -39,9 +36,6 @@ ChunkedList<T, ChunkSize>::Chunk::operator+(const size_t offset) {
   return *chunk;
 }
 
-/**
- * @brief returns the chunk x chunks behind the given chunk. Does not account for overflows
- */
 template<typename T, size_t ChunkSize>
 typename ChunkedList<T, ChunkSize>::Chunk &
 ChunkedList<T, ChunkSize>::Chunk::operator-(const size_t offset) {

@@ -6,9 +6,6 @@
 #include "internal/ChunkedListMacros.hpp"
 #include "internal/ChunkedListUtility.hpp"
 
-/**
- * @brief simply pushes a chunk to the back, without mutating the chunkCount
- */
 template<typename T, size_t ChunkSize>
 void ChunkedList<T, ChunkSize>::pushChunk(Chunk *chunk) {
   back->nextChunk = chunk;
@@ -115,8 +112,18 @@ typename ChunkedList<T, ChunkSize>::ChunkIterator ChunkedList<T, ChunkSize>::beg
 }
 
 template<typename T, size_t ChunkSize>
+typename ChunkedList<T, ChunkSize>::ConstChunkIterator ChunkedList<T, ChunkSize>::beginChunk() const {
+  return ConstChunkIterator{front};
+}
+
+template<typename T, size_t ChunkSize>
 typename ChunkedList<T, ChunkSize>::ChunkIterator ChunkedList<T, ChunkSize>::endChunk() {
   return ChunkIterator{nullptr};
+}
+
+template<typename T, size_t ChunkSize>
+typename ChunkedList<T, ChunkSize>::ConstChunkIterator ChunkedList<T, ChunkSize>::endChunk() const {
+  return ConstChunkIterator{nullptr};
 }
 
 template<typename T, size_t ChunkSize>
@@ -176,9 +183,6 @@ bool ChunkedList<T, ChunkSize>::empty() const {
   return back->nextIndex == 0;
 }
 
-/**
- * @brief returns true if every item in the other chunked list is the same as in the given chunked list
- */
 template<typename T, size_t ChunkSize>
 bool ChunkedList<T, ChunkSize>::operator==(const ChunkedList &other) const {
   if (size() != other.size())

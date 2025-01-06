@@ -7,9 +7,6 @@
 
 using namespace ChunkedListUtility;
 
-/**
- * @brief Calls the given sort function on the chunked list
- */
 template<typename Compare, SortType Sort = QuickSort, typename T, size_t ChunkSize>
 void ChunkedListUtility::sort(ChunkedList<T, ChunkSize> &chunkedList) {
   using namespace SortFunctions;
@@ -70,8 +67,8 @@ void SortFunctions::selectionSort(ChunkedList<T, ChunkSize> &chunkedList) {
   }
 }
 
-template <typename Compare, typename T, size_t ChunkSize>
-void SortFunctions::insertionSort(ChunkedList<T, ChunkSize>& chunkedList) {
+template<typename Compare, typename T, size_t ChunkSize>
+void SortFunctions::insertionSort(ChunkedList<T, ChunkSize> &chunkedList) {
   if (chunkedList.size() <= 1) return;
 
   Compare compare;

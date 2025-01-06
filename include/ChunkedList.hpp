@@ -28,8 +28,14 @@ class ChunkedList {
 
         ~Chunk() = default;
 
+        /**
+         * @brief returns the chunk x chunks ahead of the given chunk. Does not account for overflows
+         */
         Chunk &operator+(size_t offset);
 
+        /**
+         * @brief returns the chunk x chunks behind the given chunk. Does not account for overflows
+         */
         Chunk &operator-(size_t offset);
 
         size_t nextIndex{0};
@@ -53,7 +59,120 @@ class ChunkedList {
     Chunk *front{nullptr};
     Chunk *back{nullptr};
 
+    /**
+     * @brief simply pushes a chunk to the back, without mutating the chunkCount
+     */
     void pushChunk(Chunk *chunk);
+
+    template<typename ChunkT>
+    class GenericChunkIterator {
+      public:
+        // stl compatibility
+
+        using value_type = Chunk;
+        using difference_type = std::ptrdiff_t;
+        using pointer = Chunk *;
+        using reference = Chunk &;
+        using iterator_category = std::bidirectional_iterator_tag;
+
+        explicit GenericChunkIterator(ChunkT *chunkPtr);
+
+        explicit GenericChunkIterator(ChunkT &chunkRef);
+
+        virtual ~GenericChunkIterator() = default;
+
+        GenericChunkIterator operator++();
+
+        GenericChunkIterator operator++(int);
+
+        GenericChunkIterator operator--();
+
+        GenericChunkIterator operator--(int);
+
+        GenericChunkIterator operator+(size_t offset) const;
+
+        GenericChunkIterator operator-(size_t offset) const;
+
+        GenericChunkIterator operator+=(size_t offset);
+
+        GenericChunkIterator operator-=(size_t offset);
+
+        template<typename ChunkIteratorT>
+        bool operator==(ChunkIteratorT other) const;
+
+        template<typename ChunkIteratorT>
+        bool operator!=(ChunkIteratorT other) const;
+
+        ChunkT &operator*();
+
+        const ChunkT &operator*() const;
+
+        ChunkT *operator->();
+
+        const ChunkT *operator->() const;
+
+      protected:
+        ChunkT *chunk{nullptr};
+    };
+
+    template<typename ChunkT, typename ValueT>
+    class GenericIterator {
+      using ChunkIteratorT = GenericChunkIterator<ChunkT>;
+
+      public:
+        // stl compatibility
+        using value_type = ValueT;
+        using difference_type = std::ptrdiff_t;
+        using pointer = ValueT *;
+        using reference = ValueT &;
+        using iterator_category = std::bidirectional_iterator_tag;
+
+        explicit GenericIterator(ChunkT *chunkPtr, size_t index = 0);
+
+        explicit GenericIterator(ChunkT &chunkRef, size_t index = 0);
+
+        explicit GenericIterator(ChunkIteratorT chunkIterator, size_t index = 0);
+
+        ~GenericIterator() = default;
+
+        GenericIterator operator++();
+
+        GenericIterator operator++(int);
+
+        GenericIterator operator--();
+
+        GenericIterator operator--(int);
+
+        GenericIterator operator+(size_t offset);
+
+        GenericIterator operator-(size_t offset);
+
+        GenericIterator operator+=(size_t offset);
+
+        GenericIterator operator-=(size_t offset);
+
+        template<typename IteratorT>
+        bool operator==(IteratorT other) const;
+
+        template<typename IteratorT>
+        bool operator!=(IteratorT other) const;
+
+        ValueT &operator*();
+
+        const ValueT &operator*() const;
+
+        ValueT *operator->();
+
+        const ValueT *operator->() const;
+
+        size_t getIndex() const;
+
+        ChunkIteratorT getChunkIterator() const;
+
+      protected:
+        ChunkIteratorT chunkIterator{};
+        size_t index{0};
+    };
 
   public:
     ChunkedList();
@@ -62,180 +181,13 @@ class ChunkedList {
 
     ~ChunkedList();
 
-    class ConstChunkIterator;
+    using ChunkIterator = GenericChunkIterator<Chunk>;
 
-    class ChunkIterator {
-      public:
-        virtual ~ChunkIterator() = default;
+    using ConstChunkIterator = GenericChunkIterator<const Chunk>;
 
-        explicit ChunkIterator(Chunk *chunk);
+    using Iterator = GenericIterator<Chunk, T>;
 
-        ChunkIterator operator++();
-
-        ChunkIterator operator++(int);
-
-        ChunkIterator operator--();
-
-        ChunkIterator operator--(int);
-
-        ChunkIterator operator+(size_t offset) const;
-
-        ChunkIterator operator-(size_t offset) const;
-
-        ChunkIterator operator+=(size_t offset);
-
-        ChunkIterator operator-=(size_t offset);
-
-        Chunk &operator*();
-
-        Chunk *operator->();
-
-        virtual const Chunk &operator*() const;
-
-        virtual const Chunk *operator->() const;
-
-        bool operator==(ChunkIterator other) const;
-
-        bool operator==(ConstChunkIterator other) const;
-
-        bool operator!=(ChunkIterator other) const;
-
-        bool operator!=(ConstChunkIterator other) const;
-
-        T &operator[](size_t index);
-
-        virtual const T &operator[](size_t index) const;
-
-      protected:
-        Chunk *chunk;
-    };
-
-    class ConstChunkIterator final : ChunkIterator {
-      public:
-        explicit ConstChunkIterator(Chunk *chunk);
-
-        using ChunkIterator::operator++;
-
-        using ChunkIterator::operator--;
-
-        using ChunkIterator::operator+;
-
-        using ChunkIterator::operator-;
-
-        using ChunkIterator::operator+=;
-
-        using ChunkIterator::operator-=;
-
-        const Chunk &operator*() const override;
-
-        const Chunk *operator->() const override;
-
-        using ChunkIterator::operator==;
-
-        using ChunkIterator::operator!=;
-
-        const T &operator[](size_t index) const override;
-    };
-
-    class ConstIterator;
-
-    class Iterator {
-      public:
-        // stl compatibility
-
-        using value_type = T;
-        using difference_type = std::ptrdiff_t;
-        using pointer = T *;
-        using reference = T &;
-        using iterator_category = std::bidirectional_iterator_tag;
-
-        explicit Iterator(Chunk *chunk);
-
-        Iterator(Chunk *chunk, size_t index);
-
-        explicit Iterator(Chunk &chunk);
-
-        Iterator(Chunk &chunk, size_t index);
-
-        explicit Iterator(ChunkIterator chunkIterator);
-
-        Iterator(ChunkIterator chunkIterator, size_t index);
-
-        ~Iterator() = default;
-
-        Iterator operator++();
-
-        Iterator operator++(int);
-
-        Iterator operator--();
-
-        Iterator operator--(int);
-
-        Iterator operator+(size_t offset);
-
-        Iterator operator-(size_t offset);
-
-        Iterator operator+=(size_t offset);
-
-        Iterator operator-=(size_t offset);
-
-        T &operator*();
-
-        T *operator->();
-
-        const T &operator*() const;
-
-        const T *operator->() const;
-
-        bool operator==(Iterator other) const;
-
-        bool operator==(ConstIterator other) const;
-
-        bool operator!=(Iterator other) const;
-
-        bool operator!=(ConstIterator other) const;
-
-      protected:
-        ChunkIterator chunkIterator{};
-        size_t index{0};
-    };
-
-    class ConstIterator final : Iterator {
-      public:
-        explicit ConstIterator(const Chunk *chunk);
-
-        ConstIterator(const Chunk *chunk, size_t index);
-
-        explicit ConstIterator(const Chunk &chunk);
-
-        ConstIterator(const Chunk &chunk, size_t index);
-
-        explicit ConstIterator(ChunkIterator chunkIterator);
-
-        ConstIterator(ChunkIterator chunkIterator, size_t index);
-
-        ~ConstIterator() = default;
-
-        using Iterator::operator++;
-
-        using Iterator::operator--;
-
-        ConstIterator operator+(size_t offset) const;
-
-        ConstIterator operator-(size_t offset) const;
-
-        using Iterator::operator+=;
-
-        using Iterator::operator-=;
-
-        const T &operator*() const;
-
-        const T *operator->() const;
-
-        using Iterator::operator==;
-
-        using Iterator::operator!=;
-    };
+    using ConstIterator = GenericIterator<const Chunk, const T>;
 
     T &operator[](size_t index);
 
@@ -251,7 +203,11 @@ class ChunkedList {
 
     ChunkIterator beginChunk();
 
+    ConstChunkIterator beginChunk() const;
+
     ChunkIterator endChunk();
+
+    ConstChunkIterator endChunk() const;
 
     void push(T value);
 
@@ -269,6 +225,9 @@ class ChunkedList {
 
     bool empty() const;
 
+    /**
+     * @brief returns true if every item in the other chunked list is the same as in the given chunked list
+     */
     bool operator==(const ChunkedList &other) const;
 
     bool operator!=(const ChunkedList &other) const;
