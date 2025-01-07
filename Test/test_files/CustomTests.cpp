@@ -21,10 +21,10 @@ int main() {
     }
 
     const auto end = std::chrono::high_resolution_clock::now();
-    const auto duration_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
-    const auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    const auto duration_s = std::chrono::duration_cast<std::chrono::duration<double> >(end - start);
+    const auto duration_ns = std::chrono::duration_cast<std::chrono::duration<double, std::nano> >(end - start);
 
-    std::cout << "Total time taken to push " << pushes << " integers: " << duration_ms.count() << " milliseconds\n";
+    std::cout << "Total time taken to push " << pushes << " integers: " << duration_s.count() << " seconds\n";
     std::cout << "Average time to push 1 integer: " << duration_ns.count() / pushes << " nanoseconds" << std::endl;
   });
 
