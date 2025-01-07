@@ -230,9 +230,9 @@ template<typename T, size_t ChunkSize>
 template<typename OutputStream, typename StringType, typename DelimiterType, StringType(*ConversionCall)(
   OutputStream &)>
 StringType ChunkedList<T, ChunkSize>::concat(const DelimiterType delimiter) {
-  static_assert(ChunkedListUtility::has_insertion_operator_v<OutputStream, StringType>,
+  static_assert(ChunkedListUtility::CanInsert<OutputStream, StringType>,
                 "OutputStream cannot handle StringType");
-  static_assert(ChunkedListUtility::has_insertion_operator_v<OutputStream, StringType>,
+  static_assert(ChunkedListUtility::CanInsert<OutputStream, StringType>,
                 "OutputStream cannot handle SeparatorType");
 
   OutputStream stream;

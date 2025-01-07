@@ -16,17 +16,11 @@ namespace ChunkedListUtility {
     HeapSort,
   };
 
-  template<typename, typename, typename = void>
-  class has_insertion_operator : public std::false_type {
+  template<typename OutputStream, typename T>
+  concept CanInsert = requires(OutputStream os, T obj)
+  {
+    { os << obj } -> std::same_as<std::ostream &>;
   };
-
-  template<typename Class, typename Parameter>
-  class has_insertion_operator<Class, Parameter, std::void_t<decltype(
-    std::declval<Class &>() << std::declval<Parameter>())> > : public std::true_type {
-  };
-
-  template<typename Class, typename Parameter>
-  constexpr bool has_insertion_operator_v = has_insertion_operator<Class, Parameter>::value;
 
   /**
    * @brief Calls the given sort function on the chunked list
