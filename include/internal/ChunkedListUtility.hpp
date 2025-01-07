@@ -19,7 +19,7 @@ namespace ChunkedListUtility {
   template<typename OutputStream, typename T>
   concept CanInsert = requires(OutputStream os, T obj)
   {
-    { os << obj } -> std::same_as<OutputStream &>;
+    { os << obj } -> std::convertible_to<std::ostream &>;
   };
 
   /**
