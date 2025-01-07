@@ -28,16 +28,16 @@ void chunked_list<T, ChunkSize>::pop_chunk() {
 }
 
 template<typename T, size_t ChunkSize>
-bool chunked_list<T, ChunkSize>::operator==(const chunked_list& other) const {
+bool chunked_list<T, ChunkSize>::operator==(const chunked_list &other) const {
   return derived_chunked_list::operator==(other);
 }
 
 template<typename T, size_t ChunkSize>
-bool chunked_list<T, ChunkSize>::operator!=(const chunked_list& other) const {
+bool chunked_list<T, ChunkSize>::operator!=(const chunked_list &other) const {
   return derived_chunked_list::operator!=(other);
 }
 
 template<typename T, size_t ChunkSize>
 std::ostream &operator<<(std::ostream &os, chunked_list<T, ChunkSize> &chunkedList) {
-  return operator<<(os, *reinterpret_cast<ChunkedList<T, ChunkSize>*>(&chunkedList));
+  return operator<<(os, *reinterpret_cast<ChunkedList<T, ChunkSize> *>(&chunkedList));
 }

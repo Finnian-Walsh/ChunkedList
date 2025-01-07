@@ -69,10 +69,10 @@ class ChunkedList {
       public:
         // stl compatibility
 
-        using value_type = Chunk;
+        using value_type = ChunkT;
         using difference_type = std::ptrdiff_t;
-        using pointer = Chunk *;
-        using reference = Chunk &;
+        using pointer = ChunkT *;
+        using reference = ChunkT &;
         using iterator_category = std::bidirectional_iterator_tag;
 
         explicit GenericChunkIterator(ChunkT *chunkPtr);

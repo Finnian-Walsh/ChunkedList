@@ -7,7 +7,6 @@ template<typename T, size_t ChunkSize>
 class ChunkedList;
 
 namespace ChunkedListUtility {
-
   enum SortType {
     BubbleSort,
     SelectionSort,

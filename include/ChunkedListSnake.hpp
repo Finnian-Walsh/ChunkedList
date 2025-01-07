@@ -1,7 +1,5 @@
 #pragma once
 
-#include <ostream>
-
 #include "ChunkedList.hpp"
 
 template<typename T, size_t ChunkSize = 32>
