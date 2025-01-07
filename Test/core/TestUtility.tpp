@@ -264,10 +264,13 @@ void Tests::Iterators() {
   for (int i = 11; i <= 1000; ++i) {
     chunkedList.push(i);
   } {
+    performTask(((std::string{"Calling "} += VARIANT_CODE("beginChunk", "begin_chunk")) += "method").c_str());
     auto chunkIt = chunkedList.VARIANT_CODE(beginChunk, begin_chunk)();
     auto chunkIt2 = chunkIt + 1;
+
     THROW_IF(chunkIt2 - 1 != chunkIt, "ChunkIterator + 1 - 1 is unequal to ChunkIterator")
-    THROW_IF(chunkIt2 != ++chunkIt, "ChunkIterator + 1 is unequal to ++ChunkIterator")
+    THROW_IF(chunkIt2 != std::next(chunkIt), "ChunkIterator + 1 is unequal to std::next(ChunkIterator)")
+    THROW_IF(std::prev(chunkIt2) != chunkIt, "std::prev(ChunkIterator + 1) is unequal to ChunkIterator")
   }
 }
 
