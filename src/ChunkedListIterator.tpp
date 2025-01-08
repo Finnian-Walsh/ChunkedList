@@ -1,4 +1,5 @@
 #pragma once
+#include "ChunkedList.hpp"
 
 // ---------------------------------------------------------------------------------------------------------------------
 // GenericIterator implementation
@@ -133,6 +134,7 @@ template<typename T, size_t ChunkSize>
 template<typename ChunkT, typename ValueT>
 template<typename IteratorT>
 bool ChunkedList<T, ChunkSize>::GenericIterator<ChunkT, ValueT>::operator==(const IteratorT other) const {
+  static_assert(ChunkedListUtility::IsGenericIterator<ChunkedList, IteratorT>, "IteratorT must be a GenericIterator!");
   return chunkIterator == other.getChunkIterator() && index == other.getIndex();
 }
 
@@ -140,6 +142,7 @@ template<typename T, size_t ChunkSize>
 template<typename ChunkT, typename ValueT>
 template<typename IteratorT>
 bool ChunkedList<T, ChunkSize>::GenericIterator<ChunkT, ValueT>::operator!=(const IteratorT other) const {
+  static_assert(ChunkedListUtility::IsGenericIterator<ChunkedList, IteratorT>, "IteratorT must be a GenericIterator!");
   return chunkIterator != other.getChunkIterator() || index != other.getIndex();
 }
 
@@ -273,6 +276,7 @@ template<typename T, size_t ChunkSize>
 template<typename ChunkT>
 template<typename ChunkIteratorT>
 bool ChunkedList<T, ChunkSize>::GenericChunkIterator<ChunkT>::operator==(const ChunkIteratorT other) const {
+  static_assert(ChunkedListUtility::IsGenericChunkIterator<ChunkedList, ChunkIteratorT>, "ChunkIteratorT must be a GenericChunkIterator!");
   return chunk == &*other;
 }
 
@@ -280,6 +284,7 @@ template<typename T, size_t ChunkSize>
 template<typename ChunkT>
 template<typename ChunkIteratorT>
 bool ChunkedList<T, ChunkSize>::GenericChunkIterator<ChunkT>::operator!=(const ChunkIteratorT other) const {
+  static_assert(ChunkedListUtility::IsGenericChunkIterator<ChunkedList, ChunkIteratorT>, "ChunkIteratorT must be a GenericChunkIterator!");
   return chunk != &*other;
 }
 

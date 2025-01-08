@@ -16,6 +16,29 @@ namespace ChunkedListUtility {
     HeapSort,
   };
 
+  template<template <typename...> typename TemplateT, typename T>
+  class IsTemplateOf {
+    template<typename>
+    class Impl : public std::false_type {
+    };
+
+    template<typename... Args>
+    class Impl<TemplateT<Args...> > : public std::true_type {
+    };
+
+    public:
+      static constexpr bool value = Impl<T>::value;
+  };
+
+  template<template <typename...> class Template, typename T>
+  concept TemplateOf = IsTemplateOf<Template, T>::value;
+
+  template<typename ChunkedListT, typename T>
+  concept IsGenericIterator = TemplateOf<ChunkedListT::template GenericIterator, T>;
+
+  template<typename ChunkedListT, typename T>
+  concept IsGenericChunkIterator = TemplateOf<ChunkedListT::template GenericChunkIterator, T>;
+
   template<typename OutputStream, typename T>
   concept CanInsert = requires(OutputStream os, T obj)
   {
