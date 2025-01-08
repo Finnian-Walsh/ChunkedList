@@ -79,7 +79,7 @@ class ChunkedList {
 
         explicit GenericChunkIterator(ChunkT &chunkRef);
 
-        virtual ~GenericChunkIterator() = default;
+        ~GenericChunkIterator() = default;
 
         GenericChunkIterator operator++();
 
