@@ -206,21 +206,21 @@ This implements the **chunked_list** class, with identical functionality to the 
 #include <random>
 
 int main() {
-  chunked_list<int, 32> chunkedList{};
+  chunked_list<int, 32> obj{};
   
   std::mt19937 gen{std::random_device{}};
   std::uniform_int_distribution<int> dist{1, 100};
   
   for (int i = 0; i < 1000; ++i) {
     int num = dist(gen);
-    chunkedList.push_back(num);
+    obj.push(num);
   }
 
-  std::cout << "Unsorted: " << chunkedList << std::endl;
+  std::cout << "Unsorted: " << obj << std::endl;
   
-  chunkedList.sort<std::less<int>, HeapSort>();
+  obj.sort<std::less<int>, HeapSort>();
   
-  std::cout << "Sorted: " << chunkedList << std::endl;
+  std::cout << "Sorted: " << obj << std::endl;
   
   return 0;
 }
