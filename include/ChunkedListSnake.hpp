@@ -37,6 +37,9 @@ class chunked_list final : ChunkedList<T, ChunkSize> {
 
     using derived_chunked_list::pop;
 
+    /**
+     * @brief Pops the back (most recent) Chunk from the ChunkedList
+     */
     void pop_chunk();
 
     using derived_chunked_list::sort;
