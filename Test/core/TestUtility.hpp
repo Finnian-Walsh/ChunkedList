@@ -27,7 +27,6 @@ namespace TestUtility {
   constexpr inline int LogLevel = 0;
 #endif
 
-
   inline int testNumber{0};
 
   class RandomNumberGenerator {
