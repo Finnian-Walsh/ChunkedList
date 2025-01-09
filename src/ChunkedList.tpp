@@ -227,8 +227,7 @@ std::ostream &operator<<(std::ostream &os, ChunkedList<T, ChunkSize> &chunkedLis
 }
 
 template<typename T, size_t ChunkSize>
-template<typename OutputStream, typename StringType, typename DelimiterType, StringType(*ConversionCall)(
-  OutputStream &)>
+template<typename OutputStream, typename StringType, typename DelimiterType>
 StringType ChunkedList<T, ChunkSize>::concat(const DelimiterType delimiter) {
   static_assert(ChunkedListUtility::CanInsert<OutputStream, StringType>,
                 "OutputStream cannot handle StringType");
@@ -252,11 +251,7 @@ StringType ChunkedList<T, ChunkSize>::concat(const DelimiterType delimiter) {
 
   stream << *lastIt;
 
-  if constexpr (ConversionCall == nullptr) {
-    return StringType{stream.str()};
-  } else {
-    return ConversionCall(stream);
-  }
+  return stream.str();
 }
 
 template<typename T, size_t ChunkSize>
