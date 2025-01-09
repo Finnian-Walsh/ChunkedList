@@ -9,9 +9,9 @@
 using namespace TestUtility;
 
 int main() {
-  constexpr size_t pushes = 1'000;
+  constexpr size_t pushes = 1000;
 
-  callFunction("Integer push time test", [] {
+  callFunction("ChunkedList<int> push time test", [] {
     ChunkedList<int, pushes> testList;
 
     std::cout << "starting..." << std::endl;
@@ -30,7 +30,7 @@ int main() {
     std::cout << "Average time to push 1 integer: " << duration_ns.count() / pushes << " nanoseconds" << std::endl;
   });
 
-  callFunction("Integer push time test", [] {
+  callFunction("std::list<int> push time test", [] {
     std::list<int> testList;
 
     std::cout << "starting..." << std::endl;
@@ -49,7 +49,7 @@ int main() {
     std::cout << "Average time to push 1 integer: " << duration_ns.count() / pushes << " nanoseconds" << std::endl;
   });
 
-  callFunction("Integer push time test", [] {
+  callFunction("std::vector<int> push time test", [] {
     std::vector<int> testList;
 
     std::cout << "starting..." << std::endl;

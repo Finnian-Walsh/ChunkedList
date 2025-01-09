@@ -10,7 +10,7 @@ int main() {
 
   using namespace Tests;
 
-    callFunction("Front and back", [] {
+  callFunction("Front and back", [] {
     testData.setSource("Test 1");
     FrontAndBack<chunked_list, 1>();
 
