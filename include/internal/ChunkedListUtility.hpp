@@ -6,18 +6,17 @@
 template<typename T, size_t ChunkSize>
 class ChunkedList;
 
-namespace ChunkedListUtility {
+namespace chunked_list_utility {
   enum SortType {
     BubbleSort,
     SelectionSort,
     InsertionSort,
-    MergeSort,
     QuickSort,
     HeapSort,
   };
 
   template<template <typename...> typename TemplateT, typename T>
-  class IsTemplateOf {
+  class is_template_of {
     template<typename>
     class Impl : public std::false_type {
     };
@@ -31,19 +30,21 @@ namespace ChunkedListUtility {
   };
 
   template<template <typename...> class Template, typename T>
-  concept TemplateOf = IsTemplateOf<Template, T>::value;
+  concept template_of = is_template_of<Template, T>::value;
 
   template<typename ChunkedListT, typename T>
-  concept IsGenericIterator = TemplateOf<ChunkedListT::template GenericIterator, T>;
+  concept is_generic_iterator = template_of<ChunkedListT::template GenericIterator, T>;
 
   template<typename ChunkedListT, typename T>
-  concept IsGenericChunkIterator = TemplateOf<ChunkedListT::template GenericChunkIterator, T>;
+  concept is_generic_chunk_iterator = template_of<ChunkedListT::template GenericChunkIterator, T>;
 
-  template<typename OutputStream, typename T>
-  concept CanInsert = requires(OutputStream os, T obj)
-  {
-    { os << obj } -> std::convertible_to<std::ostream &>;
-  };
+  template<typename BaseOutputStream, typename OutputStream, typename T>
+  concept can_insert = (std::is_base_of_v<BaseOutputStream, OutputStream>
+                        || std::is_same_v<BaseOutputStream, OutputStream>)
+                       && requires(OutputStream os, T obj)
+                       {
+                         { os << obj } -> std::convertible_to<BaseOutputStream &>;
+                       };
 
   /**
    * @brief Calls the given sort function on the chunked list
@@ -51,25 +52,22 @@ namespace ChunkedListUtility {
   template<typename Compare, SortType Sort, typename T, size_t ChunkSize>
   void sort(ChunkedList<T, ChunkSize> &chunkedList);
 
-  namespace SortFunctions {
+  namespace sort_functions {
     template<typename Compare, typename T, size_t ChunkSize>
-    void bubbleSort(ChunkedList<T, ChunkSize> &chunkedList);
+    void bubble_sort(ChunkedList<T, ChunkSize> &chunkedList);
 
     template<typename Compare, typename T, size_t ChunkSize>
-    void selectionSort(ChunkedList<T, ChunkSize> &chunkedList);
+    void selection_sort(ChunkedList<T, ChunkSize> &chunkedList);
 
     template<typename Compare, typename T, size_t ChunkSize>
-    void insertionSort(ChunkedList<T, ChunkSize> &chunkedList);
+    void insertion_sort(ChunkedList<T, ChunkSize> &chunkedList);
 
     template<typename Compare, typename T, size_t ChunkSize>
-    void mergeSort(ChunkedList<T, ChunkSize> &chunkedList);
-
-    template<typename Compare, typename T, size_t ChunkSize>
-    void quickSort(typename ChunkedList<T, ChunkSize>::Iterator start,
+    void quick_sort(typename ChunkedList<T, ChunkSize>::Iterator start,
                    typename ChunkedList<T, ChunkSize>::Iterator end);
 
     template<typename Compare, typename T, size_t ChunkSize>
-    void heapSort(ChunkedList<T, ChunkSize> &chunkedList);
+    void heap_sort(ChunkedList<T, ChunkSize> &chunkedList);
   }
 }
 
