@@ -54,9 +54,6 @@ int main() {
     testData.setSource("Insertion Sorting");
     Sorting<InsertionSort, chunked_list>();
 
-    // testData.setSource("Merge Sorting");
-    // Sorting<MergeSort, chunked_list>();
-
     testData.setSource("Quick Sorting");
     Sorting<QuickSort, chunked_list>();
 

@@ -517,6 +517,7 @@ class ChunkedList {
      */
     template<
       typename OutputStream = std::ostringstream,
+      typename BaseOutputStream = std::ostream,
       typename StringType = std::string,
       typename SeparatorType = std::string>
     StringType concat(SeparatorType delimiter = ", ");

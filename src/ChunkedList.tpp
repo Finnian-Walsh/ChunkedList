@@ -170,7 +170,7 @@ template<typename T, size_t ChunkSize>
 template<typename Compare, SortType Sort>
 void ChunkedList<T, ChunkSize>::sort() {
   DEBUG_LOG("Calling sort utility function using " << typeid(Compare).name() << " class to compare")
-  ChunkedListUtility::sort<Compare, Sort>(*this);
+  chunked_list_utility::sort<Compare, Sort>(*this);
 }
 
 template<typename T, size_t ChunkSize>
@@ -227,11 +227,11 @@ std::ostream &operator<<(std::ostream &os, ChunkedList<T, ChunkSize> &chunkedLis
 }
 
 template<typename T, size_t ChunkSize>
-template<typename OutputStream, typename StringType, typename DelimiterType>
+template<typename OutputStream, typename BaseOutputStream, typename StringType, typename DelimiterType>
 StringType ChunkedList<T, ChunkSize>::concat(const DelimiterType delimiter) {
-  static_assert(ChunkedListUtility::CanInsert<OutputStream, StringType>,
+  static_assert(chunked_list_utility::can_insert<BaseOutputStream, OutputStream, StringType>,
                 "OutputStream cannot handle StringType");
-  static_assert(ChunkedListUtility::CanInsert<OutputStream, StringType>,
+  static_assert(chunked_list_utility::can_insert<BaseOutputStream, OutputStream, StringType>,
                 "OutputStream cannot handle SeparatorType");
 
   OutputStream stream;
